@@ -14,6 +14,8 @@ type DragState = {
   assetId: string;
   offsetX: number;
   offsetY: number;
+  width: number;
+  height: number;
 } | null;
 
 export function BoardView({ container, onMoveAsset }: BoardViewProps) {
@@ -24,7 +26,9 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
     event: PointerEvent<HTMLDivElement>,
     assetId: string,
     x: number,
-    y: number
+    y: number,
+    width: number,
+    height: number
   ) {
     const board = boardRef.current;
     if (!board) {
@@ -34,7 +38,9 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
     dragState.current = {
       assetId,
       offsetX: event.clientX - rect.left - x,
-      offsetY: event.clientY - rect.top - y
+      offsetY: event.clientY - rect.top - y,
+      width,
+      height
     };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -46,8 +52,14 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
       return;
     }
     const rect = board.getBoundingClientRect();
-    const x = Math.max(8, Math.min(rect.width - 236, event.clientX - rect.left - drag.offsetX));
-    const y = Math.max(8, Math.min(rect.height - 236, event.clientY - rect.top - drag.offsetY));
+    const x = Math.max(
+      8,
+      Math.min(rect.width - drag.width - 8, event.clientX - rect.left - drag.offsetX)
+    );
+    const y = Math.max(
+      8,
+      Math.min(rect.height - drag.height - 8, event.clientY - rect.top - drag.offsetY)
+    );
     onMoveAsset(drag.assetId, Math.round(x), Math.round(y));
   }
 
@@ -97,9 +109,16 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
           ? sortAssets(container.assets).map((asset, index) => (
               <div
                 key={asset.id}
-                className="asset-card"
+                className={`asset-card ${asset.isPrimary ? "primary" : ""}`}
                 onPointerDown={(event) =>
-                  handlePointerDown(event, asset.id, asset.position.x, asset.position.y)
+                  handlePointerDown(
+                    event,
+                    asset.id,
+                    asset.position.x,
+                    asset.position.y,
+                    asset.isPrimary ? 360 : 220,
+                    asset.isPrimary ? 360 : 236
+                  )
                 }
                 style={{
                   left: asset.position.x,
@@ -108,19 +127,23 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
                   zIndex: index + 1
                 }}
               >
-                <span className={`pin ${index % 2 === 0 ? "red" : "blue"}`} />
+                <span
+                  className={`pin ${asset.isPrimary ? "gold" : index % 2 === 0 ? "red" : "blue"}`}
+                />
                 {asset.imageUrl ? (
                   <Image
                     alt={asset.title}
                     src={asset.imageUrl}
-                    width={400}
-                    height={280}
+                    width={asset.isPrimary ? 680 : 400}
+                    height={asset.isPrimary ? 460 : 280}
                     unoptimized={asset.imageUrl.startsWith("data:")}
                   />
                 ) : null}
                 <h4 className="asset-title">{asset.title}</h4>
                 {asset.note ? <p className="asset-note">{asset.note}</p> : null}
-                <p className="asset-meta">{assetLabel(asset.type)}</p>
+                <p className="asset-meta">
+                  {asset.isPrimary ? "Primary sketch" : assetLabel(asset.type)}
+                </p>
               </div>
             ))
           : null}

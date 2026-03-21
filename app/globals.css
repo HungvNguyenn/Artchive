@@ -408,6 +408,12 @@ img {
   user-select: none;
 }
 
+.asset-card.primary {
+  width: 360px;
+  padding: 18px;
+  background: #fffdf8;
+}
+
 .asset-card:active {
   cursor: grabbing;
 }
@@ -418,6 +424,11 @@ img {
   object-fit: cover;
   border-radius: 12px;
   margin-bottom: 10px;
+}
+
+.asset-card.primary img {
+  height: 260px;
+  border-radius: 14px;
 }
 
 .asset-note {
@@ -444,6 +455,10 @@ img {
 
 .pin.blue {
   background: radial-gradient(circle at 30% 30%, #bfe0ea 0, var(--pin-blue) 70%);
+}
+
+.pin.gold {
+  background: radial-gradient(circle at 30% 30%, #fff5bd 0, #d39a2d 70%);
 }
 
 .asset-title {
@@ -567,5 +582,13 @@ img {
 
   .asset-card {
     width: 190px;
+  }
+
+  .asset-card.primary {
+    width: 280px;
+  }
+
+  .asset-card.primary img {
+    height: 220px;
   }
 }

@@ -18,6 +18,11 @@ export function makeId(prefix: string) {
 
 export function sortAssets(assets: Asset[]) {
   return [...assets].sort((left, right) => {
+    const leftPrimary = left.isPrimary ? 0 : 1;
+    const rightPrimary = right.isPrimary ? 0 : 1;
+    if (leftPrimary !== rightPrimary) {
+      return leftPrimary - rightPrimary;
+    }
     const leftWeight = left.type === "note" ? 1 : 0;
     const rightWeight = right.type === "note" ? 1 : 0;
     if (leftWeight !== rightWeight) {

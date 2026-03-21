@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { CreateContainerInput } from "@/lib/types";
-import { normalizeTags } from "@/lib/utils";
+import { normalizeTags, readFileAsDataUrl } from "@/lib/utils";
 
 type ContainerFormProps = {
-  onCreate: (input: CreateContainerInput) => void;
+  onCreate: (input: CreateContainerInput) => void | Promise<void>;
 };
 
 const defaultState: CreateContainerInput = {
@@ -13,27 +13,46 @@ const defaultState: CreateContainerInput = {
   description: "",
   status: "Unfinished",
   medium: "",
-  tags: []
+  tags: [],
+  mainSketchTitle: "",
+  mainSketchUrl: ""
 };
 
 export function ContainerForm({ onCreate }: ContainerFormProps) {
   const [form, setForm] = useState(defaultState);
   const [rawTags, setRawTags] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!form.name.trim()) {
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) {
       return;
     }
-    onCreate({
+    const dataUrl = await readFileAsDataUrl(file);
+    setForm((current) => ({
+      ...current,
+      mainSketchUrl: dataUrl,
+      mainSketchTitle: current.mainSketchTitle || file.name.replace(/\.[^/.]+$/, "")
+    }));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!form.name.trim() || !form.mainSketchUrl) {
+      return;
+    }
+    setIsSubmitting(true);
+    await onCreate({
       ...form,
       name: form.name.trim(),
       description: form.description.trim(),
       medium: form.medium.trim(),
-      tags: normalizeTags(rawTags)
+      tags: normalizeTags(rawTags),
+      mainSketchTitle: form.mainSketchTitle.trim() || `${form.name.trim()} Main Sketch`
     });
     setForm(defaultState);
     setRawTags("");
+    setIsSubmitting(false);
   }
 
   return (
@@ -91,8 +110,30 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
           value={rawTags}
           onChange={(event) => setRawTags(event.target.value)}
         />
-        <button className="button" type="submit">
-          Create container
+        <div className="upload-zone form-grid">
+          <div>
+            <p className="section-title">Required main sketch</p>
+            <p className="helper">
+              Every container starts with one large primary sketch that anchors the corkboard.
+            </p>
+          </div>
+          <input
+            className="input"
+            placeholder="Main sketch title"
+            value={form.mainSketchTitle}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, mainSketchTitle: event.target.value }))
+            }
+            required
+          />
+          <input type="file" accept="image/*" onChange={handleFileChange} required />
+          <p className="helper tiny">
+            Upload the sketch you want featured first. Notes and references can be added after the
+            container opens.
+          </p>
+        </div>
+        <button className="button" type="submit" disabled={isSubmitting || !form.mainSketchUrl}>
+          {isSubmitting ? "Creating..." : "Create container"}
         </button>
       </form>
     </section>

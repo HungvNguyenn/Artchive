@@ -38,11 +38,12 @@ export const seededContainers: ArtContainer[] = [
         containerId: "container-ember",
         title: "Gesture Sketch",
         type: "sketch",
+        isPrimary: true,
         imageUrl:
           "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
         createdAt: now,
         updatedAt: now,
-        position: { x: 312, y: 84, rotation: 5 }
+        position: { x: 250, y: 54, rotation: 2 }
       },
       {
         id: "asset-note-1",
@@ -72,11 +73,12 @@ export const seededContainers: ArtContainer[] = [
         containerId: "container-bloom",
         title: "Final Render",
         type: "final",
+        isPrimary: true,
         imageUrl:
           "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=900&q=80",
         createdAt: now,
         updatedAt: now,
-        position: { x: 72, y: 64, rotation: -3 }
+        position: { x: 224, y: 56, rotation: -1 }
       },
       {
         id: "asset-note-2",

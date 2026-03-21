@@ -14,39 +14,96 @@ export function CreateContainerPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [containers, setContainers] = useState<ArtContainer[]>([]);
 
-  useEffect(() => {
-    const currentSession = artchiveStore.getSession();
-    if (!currentSession) {
-      return;
+  async function loadContainersForUser(userId: string) {
+    try {
+      setContainers(await artchiveStore.listContainers(userId));
+    } catch (error) {
+      console.error("Failed to load containers", error);
+      setContainers([]);
     }
-    setSession(currentSession);
-    setContainers(artchiveStore.listContainers(currentSession.user.id));
-  }, []);
-
-  function handleSignIn(email: string, name?: string) {
-    const nextSession = artchiveStore.signIn(email, name);
-    setSession(nextSession);
-    setContainers(artchiveStore.listContainers(nextSession.user.id));
   }
 
-  function handleSignOut() {
-    artchiveStore.signOut();
+  useEffect(() => {
+    let active = true;
+
+    async function bootstrap() {
+      const currentSession = await artchiveStore.getSession();
+      if (!active || !currentSession) {
+        return;
+      }
+      setSession(currentSession);
+      await loadContainersForUser(currentSession.user.id);
+    }
+
+    void bootstrap();
+
+    const subscription = artchiveStore.subscribeToSession((nextSession) => {
+      if (!active) {
+        return;
+      }
+
+      setSession(nextSession);
+      if (!nextSession) {
+        setContainers([]);
+        return;
+      }
+
+      void loadContainersForUser(nextSession.user.id);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  async function handleAuthSubmit(input: {
+    mode: "signin" | "signup";
+    email: string;
+    password: string;
+    name?: string;
+  }) {
+    try {
+      if (input.mode === "signup") {
+        const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
+        if (result.session) {
+          setSession(result.session);
+          setContainers([]);
+          void loadContainersForUser(result.session.user.id);
+        }
+        return { message: result.message };
+      }
+
+      const nextSession = await artchiveStore.signIn(input.email, input.password);
+      if (nextSession) {
+        setSession(nextSession);
+        setContainers([]);
+        void loadContainersForUser(nextSession.user.id);
+      }
+      return;
+    } catch (error) {
+      return { message: artchiveStore.normalizeError(error) };
+    }
+  }
+
+  async function handleSignOut() {
+    await artchiveStore.signOut();
     setSession(null);
     setContainers([]);
   }
 
-  function handleCreateContainer(input: CreateContainerInput) {
+  async function handleCreateContainer(input: CreateContainerInput) {
     if (!session) {
       return;
     }
-    const created = artchiveStore.createContainer(session.user.id, input);
+    const created = await artchiveStore.createContainer(session.user.id, input);
     router.push(`/containers/${created.id}`);
   }
 
   if (!session) {
     return (
       <div className="auth-shell">
-        <AuthPanel onSubmit={handleSignIn} />
+        <AuthPanel onSubmit={handleAuthSubmit} />
       </div>
     );
   }

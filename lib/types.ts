@@ -17,6 +17,7 @@ export type Asset = {
   containerId: string;
   title: string;
   type: AssetType;
+  isPrimary?: boolean;
   imageUrl?: string;
   note?: string;
   createdAt: string;
@@ -47,6 +48,8 @@ export type CreateContainerInput = {
   status: ArtContainer["status"];
   medium: string;
   tags: string[];
+  mainSketchTitle: string;
+  mainSketchUrl: string;
 };
 
 export type CreateAssetInput = {

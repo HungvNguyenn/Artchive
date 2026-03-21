@@ -22,16 +22,9 @@ export function Sidebar({
       <div className="brand-mark">
         <div className="brand-seal" />
         <div>
-          <p className="eyebrow">Creative OS</p>
-          <h1 className="card-title">Artchive</h1>
+          <p className="eyebrow">Welcome</p>
+          <h1 className="card-title">{session.user.name}</h1>
         </div>
-      </div>
-
-      <div className="section">
-        <p className="subtitle">
-          {session.user.name}, keep every project’s intent, references, and visual exploration in
-          one place.
-        </p>
       </div>
 
       <div className="section">
@@ -59,17 +52,15 @@ export function Sidebar({
       </div>
 
       <div className="section">
-        <p className="section-title">MVP highlights</p>
-        <p className="helper">Searchable containers, tags, notes, image uploads, and a draggable board.</p>
-      </div>
-
-      <div className="section">
         <p className="section-title">Navigate</p>
         <div className="nav-links">
           <Link className={`nav-link ${activeView === "dashboard" ? "active" : ""}`} href="/">
             Dashboard
           </Link>
-          <Link className={`nav-link ${activeView === "create" ? "active" : ""}`} href="/containers/new">
+          <Link
+            className={`nav-link ${activeView === "create" ? "active" : ""}`}
+            href="/containers/new"
+          >
             New container
           </Link>
         </div>

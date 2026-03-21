@@ -154,7 +154,11 @@ export function DetailPanel({ container, onSave, onDelete, onAddAsset }: DetailP
       <form className="card form-grid" onSubmit={handleAddAsset}>
         <div>
           <p className="eyebrow">Pin something new</p>
-          <h3 className="card-title">Add note or image asset</h3>
+          <h3 className="card-title">Add notes, references, or supporting images</h3>
+          <p className="helper">
+            The primary sketch is created during setup. Use this section for references, notes, and
+            later-stage artwork.
+          </p>
         </div>
         <input
           className="input"
@@ -169,7 +173,7 @@ export function DetailPanel({ container, onSave, onDelete, onAddAsset }: DetailP
           onChange={(event) => setAssetType(event.target.value as CreateAssetInput["type"])}
         >
           <option value="reference">Reference image</option>
-          <option value="sketch">Sketch</option>
+          <option value="sketch">Additional sketch</option>
           <option value="final">Final artwork</option>
           <option value="note">Note</option>
         </select>

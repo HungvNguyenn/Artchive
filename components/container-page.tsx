@@ -19,69 +19,122 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [containers, setContainers] = useState<ArtContainer[]>([]);
 
-  useEffect(() => {
-    const currentSession = artchiveStore.getSession();
-    if (!currentSession) {
-      return;
+  async function refresh(userId: string) {
+    try {
+      setContainers(await artchiveStore.listContainers(userId));
+    } catch (error) {
+      console.error("Failed to load containers", error);
+      setContainers([]);
     }
-    setSession(currentSession);
-    setContainers(artchiveStore.listContainers(currentSession.user.id));
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    async function bootstrap() {
+      const currentSession = await artchiveStore.getSession();
+      if (!active || !currentSession) {
+        return;
+      }
+      setSession(currentSession);
+      await refresh(currentSession.user.id);
+    }
+
+    void bootstrap();
+
+    const subscription = artchiveStore.subscribeToSession((nextSession) => {
+      if (!active) {
+        return;
+      }
+
+      setSession(nextSession);
+      if (!nextSession) {
+        setContainers([]);
+        return;
+      }
+
+      void refresh(nextSession.user.id);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const container = containers.find((item) => item.id === containerId) ?? null;
 
-  function refresh(userId: string) {
-    setContainers(artchiveStore.listContainers(userId));
+  async function handleAuthSubmit(input: {
+    mode: "signin" | "signup";
+    email: string;
+    password: string;
+    name?: string;
+  }) {
+    try {
+      if (input.mode === "signup") {
+        const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
+        if (result.session) {
+          setSession(result.session);
+          setContainers([]);
+          void refresh(result.session.user.id);
+        }
+        return { message: result.message };
+      }
+
+      const nextSession = await artchiveStore.signIn(input.email, input.password);
+      if (nextSession) {
+        setSession(nextSession);
+        setContainers([]);
+        void refresh(nextSession.user.id);
+      }
+      return;
+    } catch (error) {
+      return { message: artchiveStore.normalizeError(error) };
+    }
   }
 
-  function handleSignIn(email: string, name?: string) {
-    const nextSession = artchiveStore.signIn(email, name);
-    setSession(nextSession);
-    refresh(nextSession.user.id);
-  }
-
-  function handleSignOut() {
-    artchiveStore.signOut();
+  async function handleSignOut() {
+    await artchiveStore.signOut();
     setSession(null);
     setContainers([]);
   }
 
-  function handleSaveDetails(nextContainer: ArtContainer) {
+  async function handleSaveDetails(nextContainer: ArtContainer) {
     if (!session) {
       return;
     }
-    artchiveStore.updateContainer(nextContainer.id, () => nextContainer);
-    refresh(session.user.id);
+    await artchiveStore.updateContainer(nextContainer.id, () => nextContainer);
+    await refresh(session.user.id);
   }
 
-  function handleDeleteContainer(targetId: string) {
+  async function handleDeleteContainer(targetId: string) {
     if (!session) {
       return;
     }
-    artchiveStore.deleteContainer(targetId);
+    await artchiveStore.deleteContainer(targetId);
     router.push("/");
   }
 
-  function handleAddAsset(input: CreateAssetInput) {
+  async function handleAddAsset(input: CreateAssetInput) {
     if (!session) {
       return;
     }
-    artchiveStore.addAsset(input);
-    refresh(session.user.id);
+    await artchiveStore.addAsset(input);
+    await refresh(session.user.id);
   }
 
-  function handleMoveAsset(assetId: string, x: number, y: number) {
+  async function handleMoveAsset(assetId: string, x: number, y: number) {
     if (!session || !container) {
       return;
     }
-    artchiveStore.updateAssetPosition(container.id, assetId, x, y);
-    refresh(session.user.id);
+    await artchiveStore.updateAssetPosition(container.id, assetId, x, y);
+    await refresh(session.user.id);
   }
 
   if (!session) {
     return (
       <div className="auth-shell">
-        <AuthPanel onSubmit={handleSignIn} />
+        <AuthPanel onSubmit={handleAuthSubmit} />
       </div>
     );
   }
@@ -128,7 +181,8 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
                 <p className="eyebrow">Container board</p>
                 <h2 className="title">{container.name}</h2>
                 <p className="subtitle">
-                  Keep this page focused on the board itself: arrangement, notes, images, and project details.
+                  Keep this page focused on the board itself: arrangement, notes, images, and
+                  project details.
                 </p>
               </div>
               <div className="inline-actions">

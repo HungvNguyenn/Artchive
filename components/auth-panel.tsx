@@ -2,21 +2,50 @@
 
 import { FormEvent, useState } from "react";
 
+type AuthMode = "signin" | "signup";
+
 type AuthPanelProps = {
-  onSubmit: (email: string, name?: string) => void;
+  onSubmit: (input: {
+    mode: AuthMode;
+    email: string;
+    password: string;
+    name?: string;
+  }) => Promise<{ message?: string } | void>;
 };
 
 export function AuthPanel({ onSubmit }: AuthPanelProps) {
-  const [mode, setMode] = useState<"signin" | "signup">("signup");
+  const [mode, setMode] = useState<AuthMode>("signup");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!email.trim()) {
+    if (!email.trim() || !password.trim()) {
       return;
     }
-    onSubmit(email.trim(), name.trim());
+
+    setIsSubmitting(true);
+    setFeedback("");
+
+    try {
+      const result = await onSubmit({
+        mode,
+        email: email.trim(),
+        password,
+        name: name.trim()
+      });
+
+      if (result?.message) {
+        setFeedback(result.message);
+      }
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Authentication failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -70,13 +99,23 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
             required
           />
         </label>
+        <label className="form-grid">
+          <span className="section-title">Password</span>
+          <input
+            className="input"
+            type="password"
+            placeholder="At least 6 characters"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            minLength={6}
+            required
+          />
+        </label>
         <button className="button" type="submit">
-          {mode === "signup" ? "Create demo workspace" : "Open workspace"}
+          {isSubmitting ? "Working..." : mode === "signup" ? "Create account" : "Log in"}
         </button>
-        <p className="helper">
-          This MVP uses local persistence in the browser today and is already shaped for Supabase
-          auth and storage next.
-        </p>
+        <p className="helper">Your containers, notes, and uploads are stored under your account.</p>
+        {feedback ? <p className="helper">{feedback}</p> : null}
       </form>
     </div>
   );

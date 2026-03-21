@@ -22,16 +22,7 @@ export function SearchToolbar({
       <div className="hero-top">
         <div className="hero-copy">
           <p className="eyebrow">Artist workspace</p>
-          <h2 className="title">A digital corkboard built around each artwork.</h2>
-          <p className="subtitle">
-            Search by project name, filter by tags, then dive into a board where references,
-            sketches, finals, and notes stay together.
-          </p>
-        </div>
-        <div className="hero-actions">
-          <div className="tag">Vercel-ready</div>
-          <div className="tag">Supabase-shaped</div>
-          <div className="tag">Responsive MVP</div>
+          <h2 className="title">Artchive</h2>
         </div>
       </div>
       <div className="toolbar" style={{ marginTop: 22 }}>
