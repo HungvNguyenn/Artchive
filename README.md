@@ -1,58 +1,48 @@
 # Artchive
 
-Artchive is a Next.js MVP for a corkboard-style art organization SaaS. Each artwork gets a dedicated container for references, sketches, final images, notes, and tags.
+Artchive is a Web application designed to help many artist keep track of their reference photos, notes, and sketches all in one place. Each drawing has a container that holds anything related to that art piece together. This allows everything to be together without the hassle of looking at different sites. 
 
-## What is included
+## Features
+- Upload and organize sketches, reference images, and final artwork
+- Add notes to keep artistic context and ideas with the piece
+- Arrange assets visually on a corkboard-style board
+- Tag and search artwork for faster finding and sorting
 
-- Email-style demo sign-in flow
-- Container creation, editing, deletion
-- Tagging, search, and filtering
-- Image uploads stored in browser local storage for the MVP
-- Note pinning
-- Draggable corkboard layout
-- Supabase-ready environment setup for future auth, database, and storage integration
+## Tech Stack
+- **Frontend:** Next.js (App Router), React, TypeScript, custom CSS
+- **Backend:** Supabase
+- **Database & Auth:** Supabase (PostgreSQL, Supabase Auth)
+- **Storage:** Supabase Storage (image storage)
+- **Deployment:** Vercel
 
-## Local development
+## Local Development
 
-1. Install dependencies:
+1. Clone the repository:
+  ```bash
+   git clone https://github.com/HungvNguyenn/Artchive.git
+   cd Artchive
+   ```
+2. Install dependencies:
+  ```bash
+  npm install
+  ```
 
-```bash
-npm install
-```
+3. create a .env.local file in the project root and add:
+  ```
+  NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_publishable_key
+  ```
+4. start developement server:
+  ```bash
+  npm run dev
+  ```
+  Open http://localhost:3000 with your browser to see the result.
 
-2. Start the app:
+## Architecture
 
-```bash
-npm run dev
-```
+Artchive uses Next.js for the frontend and Supabase for authentication, database, and image storage. Users can create containers for artwork, upload assets, add notes, and manage everything in a corkboard-style workspace.
 
-3. Open [http://localhost:3000](http://localhost:3000)
+## License
 
-## Supabase integration path
+This project is for educational and portfolio purposes unless otherwise stated.
 
-This MVP currently uses a local browser persistence layer in `lib/storage.ts`. The UI contracts are intentionally shaped so the next step is swapping these methods for:
-
-- Supabase Auth for sign up / login
-- Postgres tables for users, containers, tags, and assets
-- Supabase Storage buckets for uploaded images
-
-Environment variables:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-```
-
-## Suggested schema
-
-- `containers`: `id`, `user_id`, `name`, `description`, `status`, `medium`, `created_at`, `updated_at`
-- `assets`: `id`, `container_id`, `type`, `title`, `image_path`, `note`, `x`, `y`, `rotation`, `created_at`, `updated_at`
-- `tags`: `id`, `name`
-- `container_tags`: `container_id`, `tag_id`
-
-## Deployment
-
-- Frontend: Vercel
-- Backend/Auth/Storage: Supabase
-
-When you are ready, add the Supabase keys in Vercel environment variables and replace the local storage adapter with live queries.
