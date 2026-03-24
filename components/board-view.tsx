@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PointerEvent, useEffect, useMemo, useState } from "react";
+import { MouseEvent, PointerEvent, useEffect, useMemo, useState } from "react";
 import { ArtContainer } from "@/lib/types";
 import { assetLabel, sortAssets } from "@/lib/utils";
 
@@ -45,7 +45,7 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
   }, [sortedAssets]);
 
   function handleAssetClick(
-    event: PointerEvent<HTMLDivElement>,
+    event: MouseEvent<HTMLDivElement>,
     assetId: string,
     x: number,
     y: number,
