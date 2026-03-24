@@ -111,6 +111,16 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
         </button>
         {feedback ? <p className="helper">{feedback}</p> : null}
       </form>
+      <div className="auth-footer">
+        <a
+          className="auth-link"
+          href="https://github.com/HungvNguyenn/Artchive"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Learn More
+        </a>
+      </div>
     </div>
   );
 }
