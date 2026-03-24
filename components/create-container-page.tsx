@@ -70,6 +70,7 @@ export function CreateContainerPage() {
           setSession(result.session);
           setContainers([]);
           void loadContainersForUser(result.session.user.id);
+          router.push("/");
         }
         return { message: result.message };
       }
@@ -79,6 +80,7 @@ export function CreateContainerPage() {
         setSession(nextSession);
         setContainers([]);
         void loadContainersForUser(nextSession.user.id);
+        router.push("/");
       }
       return;
     } catch (error) {

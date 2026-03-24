@@ -78,6 +78,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           setSession(result.session);
           setContainers([]);
           void refresh(result.session.user.id);
+          router.push("/");
         }
         return { message: result.message };
       }
@@ -87,6 +88,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
         setSession(nextSession);
         setContainers([]);
         void refresh(nextSession.user.id);
+        router.push("/");
       }
       return;
     } catch (error) {

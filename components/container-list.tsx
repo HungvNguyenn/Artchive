@@ -67,30 +67,32 @@ export function ContainerList({
                 )}
               </div>
 
-              <div className="container-head">
-                <div>
-                  <h4 className="container-name">{container.name}</h4>
-                  <p className="meta">
-                    {container.medium || "Medium TBD"} {"•"} {container.status}
-                  </p>
-                </div>
-                <div className="container-dates">
-                  <p className="meta">Created {formatDate(container.createdAt)}</p>
+              <div className="container-body">
+                <div className="container-head">
+                  <div>
+                    <h4 className="container-name">{container.name}</h4>
+                    <p className="meta">
+                      {container.medium || "Medium TBD"} {"•"} {container.status}
+                    </p>
+                  </div>
                   <p className="meta">Updated {formatDate(container.updatedAt)}</p>
                 </div>
-              </div>
 
-              <p className="meta container-description">
-                {container.description || "No description yet."}
-              </p>
+                <p className="meta container-description">
+                  {container.description || "No description yet."}
+                </p>
 
-              <div className="tag-row">
-                {container.tags.length === 0 ? <span className="tag">No tags</span> : null}
-                {container.tags.map((tag) => (
-                  <span className="tag" key={tag}>
-                    {tag}
-                  </span>
-                ))}
+                <div className="container-footer">
+                  <div className="tag-row">
+                    {container.tags.length === 0 ? <span className="tag">No tags</span> : null}
+                    {container.tags.map((tag) => (
+                      <span className="tag" key={tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="meta container-created">Created {formatDate(container.createdAt)}</p>
+                </div>
               </div>
             </button>
           );
