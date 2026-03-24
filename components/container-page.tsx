@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AssetEditor } from "@/components/asset-editor";
 import { AuthPanel } from "@/components/auth-panel";
 import { BoardView } from "@/components/board-view";
 import { DetailPanel } from "@/components/detail-panel";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
-import { ArtContainer, CreateAssetInput, Session } from "@/lib/types";
+import { ArtContainer, Asset, CreateAssetInput, Session } from "@/lib/types";
 
 type ContainerPageProps = {
   containerId: string;
@@ -19,6 +20,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [containers, setContainers] = useState<ArtContainer[]>([]);
   const [toolMode, setToolMode] = useState<"details" | "asset" | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   async function refresh(userId: string) {
     try {
@@ -64,6 +66,8 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
   }, []);
 
   const container = containers.find((item) => item.id === containerId) ?? null;
+  const selectedAsset =
+    container?.assets.find((asset) => asset.id === selectedAssetId) ?? null;
 
   async function handleAuthSubmit(input: {
     mode: "signin" | "signup";
@@ -125,6 +129,29 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
     }
     await artchiveStore.addAsset(input);
     await refresh(session.user.id);
+  }
+
+  async function handleSaveAsset(updates: {
+    title: string;
+    type: Asset["type"];
+    note?: string;
+    imageUrl?: string;
+  }) {
+    if (!session || !container || !selectedAsset) {
+      return;
+    }
+    await artchiveStore.updateAsset(container.id, selectedAsset.id, updates);
+    await refresh(session.user.id);
+    setSelectedAssetId(null);
+  }
+
+  async function handleDeleteAsset() {
+    if (!session || !container || !selectedAsset || selectedAsset.isPrimary) {
+      return;
+    }
+    await artchiveStore.deleteAsset(container.id, selectedAsset.id);
+    await refresh(session.user.id);
+    setSelectedAssetId(null);
   }
 
   async function handleMoveAsset(assetId: string, x: number, y: number) {
@@ -228,7 +255,11 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
               </div>
             </div>
           </section>
-          <BoardView container={container} onMoveAsset={handleMoveAsset} />
+          <BoardView
+            container={container}
+            onMoveAsset={handleMoveAsset}
+            onSelectAsset={(assetId) => setSelectedAssetId(assetId)}
+          />
         </main>
       </div>
       {toolMode ? (
@@ -252,6 +283,22 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
               onAddAsset={handleAddAsset}
               mode={toolMode}
             />
+          </div>
+        </div>
+      ) : null}
+      {selectedAsset ? (
+        <div className="modal-overlay" onClick={() => setSelectedAssetId(null)}>
+          <div className="modal-shell" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Asset settings</p>
+                <h3 className="card-title">{selectedAsset.title}</h3>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setSelectedAssetId(null)}>
+                Close
+              </button>
+            </div>
+            <AssetEditor asset={selectedAsset} onSave={handleSaveAsset} onDelete={handleDeleteAsset} />
           </div>
         </div>
       ) : null}

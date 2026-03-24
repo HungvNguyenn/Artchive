@@ -554,5 +554,104 @@ export const artchiveStore = {
     }
   },
 
+  async updateAsset(
+    containerId: string,
+    assetId: string,
+    updates: {
+      title: string;
+      type: Asset["type"];
+      note?: string;
+      imageUrl?: string;
+    }
+  ) {
+    const client = getClient();
+    const session = await this.getSession();
+    if (!session) {
+      throw new Error("You must be logged in to update assets.");
+    }
+
+    const { data: existingAsset, error: existingError } = await client
+      .from("assets")
+      .select("image_path")
+      .eq("id", assetId)
+      .eq("container_id", containerId)
+      .single();
+
+    if (existingError) {
+      throw new Error(existingError.message);
+    }
+
+    let nextImagePath = existingAsset?.image_path ?? null;
+
+    if (updates.type === "note") {
+      nextImagePath = null;
+    } else if (updates.imageUrl) {
+      nextImagePath = await uploadImage(session.user.id, containerId, assetId, updates.imageUrl);
+    }
+
+    const payload = {
+      title: updates.title,
+      type: updates.type,
+      note: updates.type === "note" ? updates.note ?? null : updates.note ?? null,
+      image_path: nextImagePath
+    };
+
+    const { error } = await client
+      .from("assets")
+      .update(payload)
+      .eq("id", assetId)
+      .eq("container_id", containerId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (
+      existingAsset?.image_path &&
+      existingAsset.image_path !== nextImagePath &&
+      (updates.type === "note" || Boolean(updates.imageUrl))
+    ) {
+      const { error: removeError } = await client.storage
+        .from(BUCKET_NAME)
+        .remove([existingAsset.image_path]);
+      if (removeError) {
+        throw new Error(removeError.message);
+      }
+    }
+  },
+
+  async deleteAsset(containerId: string, assetId: string) {
+    const client = getClient();
+    const { data: asset, error: assetError } = await client
+      .from("assets")
+      .select("image_path")
+      .eq("id", assetId)
+      .eq("container_id", containerId)
+      .single();
+
+    if (assetError) {
+      throw new Error(assetError.message);
+    }
+
+    if (asset?.image_path) {
+      const { error: removeError } = await client.storage
+        .from(BUCKET_NAME)
+        .remove([asset.image_path]);
+      if (removeError) {
+        throw new Error(removeError.message);
+      }
+    }
+
+    const { error } = await client
+      .from("assets")
+      .delete()
+      .eq("id", assetId)
+      .eq("container_id", containerId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  },
+
   normalizeError
 };

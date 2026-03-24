@@ -8,6 +8,7 @@ import { assetLabel, sortAssets } from "@/lib/utils";
 type BoardViewProps = {
   container: ArtContainer | null;
   onMoveAsset: (assetId: string, x: number, y: number) => void;
+  onSelectAsset: (assetId: string) => void;
 };
 
 type DragState = {
@@ -26,7 +27,7 @@ type PositionMap = Record<
   }
 >;
 
-export function BoardView({ container, onMoveAsset }: BoardViewProps) {
+export function BoardView({ container, onMoveAsset, onSelectAsset }: BoardViewProps) {
   const [dragState, setDragState] = useState<DragState>(null);
   const [positions, setPositions] = useState<PositionMap>({});
 
@@ -56,7 +57,6 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
     if (!board) {
       return;
     }
-
     event.stopPropagation();
 
     if (dragState?.assetId === assetId) {
@@ -116,9 +116,7 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
         <div className="row-between">
           <div>
             <h3 className="card-title">{container?.name ?? "Select a container to open its board"}</h3>
-            <p className="helper">
-              Drag pinned items to arrange your creative context visually.
-            </p>
+            <p className="helper">Click an item to move it, then click again to place it.</p>
           </div>
           {container ? <div className="tag">{container.assets.length} assets</div> : null}
         </div>
@@ -173,6 +171,19 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
                 <span
                   className={`pin ${asset.isPrimary ? "gold" : index % 2 === 0 ? "red" : "blue"}`}
                 />
+                <button
+                  className="asset-edit-button"
+                  type="button"
+                  onPointerDown={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onSelectAsset(asset.id);
+                  }}
+                >
+                  Edit
+                </button>
                 {asset.imageUrl ? (
                   <Image
                     alt={asset.title}

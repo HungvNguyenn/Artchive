@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ChangeEvent, FormEvent, PointerEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, PointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { TagInput } from "@/components/tag-input";
 import { ArtContainer, CreateAssetInput } from "@/lib/types";
 import { readFileAsDataUrl } from "@/lib/utils";
@@ -10,7 +10,7 @@ type DetailPanelProps = {
   container: ArtContainer | null;
   onSave: (container: ArtContainer) => void;
   onDelete: (containerId: string) => void;
-  onAddAsset: (input: CreateAssetInput) => void;
+  onAddAsset: (input: CreateAssetInput) => void | Promise<void>;
   mode?: "all" | "details" | "asset";
 };
 
@@ -26,6 +26,9 @@ export function DetailPanel({
   const [assetType, setAssetType] = useState<CreateAssetInput["type"]>("reference");
   const [assetNote, setAssetNote] = useState("");
   const [assetImage, setAssetImage] = useState<string | undefined>(undefined);
+  const [assetFeedback, setAssetFeedback] = useState("");
+  const [isAddingAsset, setIsAddingAsset] = useState(false);
+  const previousContainerId = useRef<string | null>(container?.id ?? null);
   const [previewDrag, setPreviewDrag] = useState<{
     pointerId: number;
     startX: number;
@@ -46,12 +49,18 @@ export function DetailPanel({
   }, [draft]);
 
   useEffect(() => {
+    const containerChanged = previousContainerId.current !== (container?.id ?? null);
     setDraft(container);
     setAssetTitle("");
     setAssetType("reference");
     setAssetNote("");
     setAssetImage(undefined);
+    if (containerChanged) {
+      setAssetFeedback("");
+    }
+    setIsAddingAsset(false);
     setPreviewDrag(null);
+    previousContainerId.current = container?.id ?? null;
   }, [container]);
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -74,22 +83,34 @@ export function DetailPanel({
     });
   }
 
-  function handleAddAsset(event: FormEvent<HTMLFormElement>) {
+  async function handleAddAsset(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!container || !assetTitle.trim()) {
       return;
     }
-    onAddAsset({
-      containerId: container.id,
-      title: assetTitle.trim(),
-      type: assetType,
-      note: assetType === "note" ? assetNote.trim() : undefined,
-      imageUrl: assetType === "note" ? undefined : assetImage
-    });
-    setAssetTitle("");
-    setAssetType("reference");
-    setAssetNote("");
-    setAssetImage(undefined);
+    setIsAddingAsset(true);
+    setAssetFeedback("");
+
+    try {
+      await onAddAsset({
+        containerId: container.id,
+        title: assetTitle.trim(),
+        type: assetType,
+        note: assetType === "note" ? assetNote.trim() : undefined,
+        imageUrl: assetType === "note" ? undefined : assetImage
+      });
+      setAssetTitle("");
+      setAssetType("reference");
+      setAssetNote("");
+      setAssetImage(undefined);
+      setAssetFeedback(
+        assetType === "note" ? "Note added to corkboard." : "Image added to corkboard."
+      );
+    } catch (error) {
+      setAssetFeedback(error instanceof Error ? error.message : "Could not add asset.");
+    } finally {
+      setIsAddingAsset(false);
+    }
   }
 
   function handlePreviewPointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -395,11 +416,11 @@ export function DetailPanel({
             <label className="upload-zone form-grid">
               <span className="section-title">Upload image</span>
               <input type="file" accept="image/*" onChange={handleFileChange} />
-              <p className="helper tiny">Images are stored locally in this MVP and can later move to Supabase Storage.</p>
             </label>
           )}
-          <button className="button" type="submit">
-            Add to corkboard
+          {assetFeedback ? <p className="helper asset-feedback">{assetFeedback}</p> : null}
+          <button className="button" type="submit" disabled={isAddingAsset}>
+            {isAddingAsset ? "Adding..." : "Add to corkboard"}
           </button>
         </form>
       ) : null}
