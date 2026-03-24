@@ -57,7 +57,7 @@ export function ContainerList({
                     style={{
                       objectFit: "cover",
                       objectPosition: `${50 + container.preview.offsetX}% ${50 + container.preview.offsetY}%`,
-                      transform: `scale(${container.preview.scale}) rotate(${container.preview.rotation}deg)`
+                      transform: `scale(${container.preview.scale})`
                     }}
                   />
                 ) : (

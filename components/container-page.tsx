@@ -142,7 +142,6 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
     }
     await artchiveStore.updateAsset(container.id, selectedAsset.id, updates);
     await refresh(session.user.id);
-    setSelectedAssetId(null);
   }
 
   async function handleDeleteAsset() {
@@ -174,7 +173,38 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
                         ...asset.position,
                         x,
                         y
-                      }
+                    }
+                  }
+              )
+            }
+      )
+    );
+
+    try {
+      await artchiveStore.updateAssetLayout(container.id, assetId, { x, y });
+    } catch (error) {
+      console.error("Failed to save asset position", error);
+      await refresh(session.user.id);
+    }
+  }
+
+  async function handleResizeAsset(assetId: string, displayWidth: number) {
+    if (!session || !container) {
+      return;
+    }
+
+    setContainers((current) =>
+      current.map((item) =>
+        item.id !== container.id
+          ? item
+          : {
+              ...item,
+              assets: item.assets.map((asset) =>
+                asset.id !== assetId
+                  ? asset
+                  : {
+                      ...asset,
+                      displayWidth
                     }
               )
             }
@@ -182,9 +212,9 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
     );
 
     try {
-      await artchiveStore.updateAssetPosition(container.id, assetId, x, y);
+      await artchiveStore.updateAssetLayout(container.id, assetId, { displayWidth });
     } catch (error) {
-      console.error("Failed to save asset position", error);
+      console.error("Failed to save asset size", error);
       await refresh(session.user.id);
     }
   }
@@ -258,6 +288,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           <BoardView
             container={container}
             onMoveAsset={handleMoveAsset}
+            onResizeAsset={handleResizeAsset}
             onSelectAsset={(assetId) => setSelectedAssetId(assetId)}
           />
         </main>

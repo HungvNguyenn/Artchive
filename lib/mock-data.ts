@@ -30,6 +30,7 @@ export const seededContainers: ArtContainer[] = [
         type: "reference",
         imageUrl:
           "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+        displayWidth: 220,
         createdAt: now,
         updatedAt: now,
         position: { x: 36, y: 48, rotation: -4 }
@@ -42,6 +43,7 @@ export const seededContainers: ArtContainer[] = [
         isPrimary: true,
         imageUrl:
           "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
+        displayWidth: 360,
         createdAt: now,
         updatedAt: now,
         position: { x: 250, y: 54, rotation: 2 }
@@ -52,6 +54,7 @@ export const seededContainers: ArtContainer[] = [
         title: "Intent Note",
         type: "note",
         note: "Push the rim light warmer than reality and keep the eye line soft so the mood stays reflective.",
+        displayWidth: 220,
         createdAt: now,
         updatedAt: now,
         position: { x: 142, y: 302, rotation: -2 }
@@ -78,6 +81,7 @@ export const seededContainers: ArtContainer[] = [
         isPrimary: true,
         imageUrl:
           "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=900&q=80",
+        displayWidth: 360,
         createdAt: now,
         updatedAt: now,
         position: { x: 224, y: 56, rotation: -1 }
@@ -88,6 +92,7 @@ export const seededContainers: ArtContainer[] = [
         title: "Palette Note",
         type: "note",
         note: "Keep the focal flower cluster high-saturation. Desaturate the glass and frame elements to support depth.",
+        displayWidth: 220,
         createdAt: now,
         updatedAt: now,
         position: { x: 372, y: 188, rotation: 3 }

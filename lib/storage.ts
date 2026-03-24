@@ -32,6 +32,7 @@ type AssetRow = {
   is_primary: boolean;
   x: number;
   y: number;
+  display_width?: number | null;
   rotation: number;
   created_at: string;
   updated_at: string;
@@ -202,6 +203,7 @@ async function attachAssetsAndTags(containers: ContainerRow[]) {
       isPrimary: row.is_primary,
       imageUrl: row.image_path ? signedUrlMap.get(row.image_path) : undefined,
       note: row.note ?? undefined,
+      displayWidth: row.display_width ?? (row.is_primary ? 360 : 220),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       position: {
@@ -407,6 +409,7 @@ export const artchiveStore = {
       is_primary: true,
       x: 220,
       y: 52,
+      display_width: 360,
       rotation: 0
     });
 
@@ -526,7 +529,8 @@ export const artchiveStore = {
       is_primary: false,
       x: 32 + Math.floor(Math.random() * 300),
       y: 44 + Math.floor(Math.random() * 220),
-      rotation: -6 + Math.floor(Math.random() * 12)
+      display_width: 220,
+      rotation: 0
     });
 
     if (error) {
@@ -538,13 +542,24 @@ export const artchiveStore = {
     return container?.assets.find((item) => item.id === assetId) ?? null;
   },
 
-  async updateAssetPosition(containerId: string, assetId: string, x: number, y: number) {
+  async updateAssetLayout(
+    containerId: string,
+    assetId: string,
+    updates: {
+      x?: number;
+      y?: number;
+      displayWidth?: number;
+    }
+  ) {
     const client = getClient();
     const { error } = await client
       .from("assets")
       .update({
-        x,
-        y
+        ...(typeof updates.x === "number" ? { x: updates.x } : {}),
+        ...(typeof updates.y === "number" ? { y: updates.y } : {}),
+        ...(typeof updates.displayWidth === "number"
+          ? { display_width: updates.displayWidth }
+          : {})
       })
       .eq("id", assetId)
       .eq("container_id", containerId);

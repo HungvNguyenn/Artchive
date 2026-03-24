@@ -20,6 +20,7 @@ export type Asset = {
   isPrimary?: boolean;
   imageUrl?: string;
   note?: string;
+  displayWidth: number;
   createdAt: string;
   updatedAt: string;
   position: Position;

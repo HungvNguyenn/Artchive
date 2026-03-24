@@ -27,7 +27,9 @@ export function DetailPanel({
   const [assetNote, setAssetNote] = useState("");
   const [assetImage, setAssetImage] = useState<string | undefined>(undefined);
   const [assetFeedback, setAssetFeedback] = useState("");
+  const [detailsFeedback, setDetailsFeedback] = useState("");
   const [isAddingAsset, setIsAddingAsset] = useState(false);
+  const [isSavingDetails, setIsSavingDetails] = useState(false);
   const previousContainerId = useRef<string | null>(container?.id ?? null);
   const [previewDrag, setPreviewDrag] = useState<{
     pointerId: number;
@@ -56,9 +58,11 @@ export function DetailPanel({
     setAssetNote("");
     setAssetImage(undefined);
     if (containerChanged) {
+      setDetailsFeedback("");
       setAssetFeedback("");
     }
     setIsAddingAsset(false);
+    setIsSavingDetails(false);
     setPreviewDrag(null);
     previousContainerId.current = container?.id ?? null;
   }, [container]);
@@ -72,15 +76,25 @@ export function DetailPanel({
     setAssetImage(dataUrl);
   }
 
-  function handleSaveDetails(event: FormEvent<HTMLFormElement>) {
+  async function handleSaveDetails(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft) {
       return;
     }
-    onSave({
-      ...draft,
-      tags: Array.from(new Set(draft.tags.map((tag) => tag.trim()).filter(Boolean)))
-    });
+    setIsSavingDetails(true);
+    setDetailsFeedback("");
+
+    try {
+      await onSave({
+        ...draft,
+        tags: Array.from(new Set(draft.tags.map((tag) => tag.trim()).filter(Boolean)))
+      });
+      setDetailsFeedback("Changes saved.");
+    } catch (error) {
+      setDetailsFeedback(error instanceof Error ? error.message : "Could not save container details.");
+    } finally {
+      setIsSavingDetails(false);
+    }
   }
 
   async function handleAddAsset(event: FormEvent<HTMLFormElement>) {
@@ -178,11 +192,14 @@ export function DetailPanel({
           <div className="row-between">
             <div>
               <p className="eyebrow">Container details</p>
-              <h3 className="card-title">Edit project metadata</h3>
+              <h3 className="card-title">Edit project</h3>
             </div>
-            <button className="button" type="submit">
-              Save changes
-            </button>
+            <div className="action-feedback">
+              <button className="button" type="submit" disabled={isSavingDetails}>
+                {isSavingDetails ? "Saving..." : "Save changes"}
+              </button>
+              {detailsFeedback ? <p className="helper asset-feedback">{detailsFeedback}</p> : null}
+            </div>
           </div>
           <input
             className="input"
@@ -249,7 +266,7 @@ export function DetailPanel({
             <div>
               <p className="eyebrow">Preview image</p>
               <p className="helper">
-                Drag the image to frame it, then use zoom to tighten or loosen the crop.
+                Drag the image to frame it, then use zoom or the sliders to fine-tune the crop.
               </p>
             </div>
             {previewImage ? (
@@ -271,7 +288,7 @@ export function DetailPanel({
                     style={{
                       objectFit: "cover",
                       objectPosition: `${50 + draft.preview.offsetX}% ${50 + draft.preview.offsetY}%`,
-                      transform: `scale(${draft.preview.scale}) rotate(${draft.preview.rotation}deg)`
+                      transform: `scale(${draft.preview.scale})`
                     }}
                   />
                   <div className="preview-stage-frame" />
@@ -287,7 +304,7 @@ export function DetailPanel({
                       style={{
                         objectFit: "cover",
                         objectPosition: `${50 + draft.preview.offsetX}% ${50 + draft.preview.offsetY}%`,
-                        transform: `scale(${draft.preview.scale}) rotate(${draft.preview.rotation}deg)`
+                        transform: `scale(${draft.preview.scale})`
                       }}
                     />
                   </div>

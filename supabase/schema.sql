@@ -58,10 +58,13 @@ create table if not exists public.assets (
   is_primary boolean not null default false,
   x integer not null default 32,
   y integer not null default 44,
+  display_width integer not null default 220,
   rotation integer not null default 0,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.assets add column if not exists display_width integer not null default 220;
 
 create table if not exists public.tags (
   id uuid primary key default gen_random_uuid(),

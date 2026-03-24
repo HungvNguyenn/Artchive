@@ -16,6 +16,9 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
   const [type, setType] = useState<AssetType>("reference");
   const [note, setNote] = useState("");
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [isSaving, setIsSaving] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (!asset) {
@@ -25,6 +28,9 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
     setType(asset.type);
     setNote(asset.note ?? "");
     setImageUrl(undefined);
+    setFeedback("");
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [asset]);
 
   if (!asset) {
@@ -41,30 +47,76 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
     setImageUrl(dataUrl);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleDownload() {
+    if (!asset?.imageUrl) {
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      const response = await fetch(asset.imageUrl);
+      if (!response.ok) {
+        throw new Error("Unable to download this image right now.");
+      }
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const extension = blob.type.split("/")[1] || "png";
+      link.href = objectUrl;
+      link.download = `${(title || asset.title).trim() || "artchive-asset"}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!title.trim()) {
       return;
     }
 
-    void onSave({
-      title: title.trim(),
-      type,
-      note: type === "note" ? note.trim() : note.trim() || undefined,
-      imageUrl: type === "note" ? undefined : imageUrl
-    });
+    setIsSaving(true);
+    setFeedback("");
+
+    try {
+      await onSave({
+        title: title.trim(),
+        type,
+        note: type === "note" ? note.trim() : note.trim() || undefined,
+        imageUrl: type === "note" ? undefined : imageUrl
+      });
+      setFeedback("Board item updated successfully.");
+      setImageUrl(undefined);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
-      <div className="row-between">
+      <div className="asset-editor-header">
         <div>
           <p className="eyebrow">Pinned asset</p>
           <h3 className="card-title">Edit this item</h3>
         </div>
-        <button className="button" type="submit">
-          Save changes
-        </button>
+        <div className="action-feedback">
+          <div className="inline-actions">
+          {asset.imageUrl ? (
+            <button className="ghost-button" type="button" onClick={() => void handleDownload()}>
+              {isDownloading ? "Downloading..." : "Download image"}
+            </button>
+          ) : null}
+          <button className="button" type="submit" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save changes"}
+          </button>
+          </div>
+          {feedback ? <p className="helper asset-feedback">{feedback}</p> : null}
+        </div>
       </div>
       <input
         className="input"
