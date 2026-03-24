@@ -21,6 +21,7 @@ export const seededContainers: ArtContainer[] = [
     tags: ["Portrait", "Color", "WIP"],
     createdAt: now,
     updatedAt: now,
+    preview: { scale: 1, offsetX: 0, offsetY: 0, rotation: 0 },
     assets: [
       {
         id: "asset-ref-1",
@@ -67,6 +68,7 @@ export const seededContainers: ArtContainer[] = [
     tags: ["Environment", "Finished", "Concept Art"],
     createdAt: now,
     updatedAt: now,
+    preview: { scale: 1, offsetX: 0, offsetY: 0, rotation: 0 },
     assets: [
       {
         id: "asset-final-1",

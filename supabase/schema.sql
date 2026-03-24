@@ -34,9 +34,18 @@ create table if not exists public.containers (
   description text not null default '',
   status text not null default 'Unfinished' check (status in ('Finished', 'Unfinished', 'Archived')),
   medium text not null default '',
+  preview_scale double precision not null default 1,
+  preview_offset_x integer not null default 0,
+  preview_offset_y integer not null default 0,
+  preview_rotation integer not null default 0,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.containers add column if not exists preview_scale double precision not null default 1;
+alter table public.containers add column if not exists preview_offset_x integer not null default 0;
+alter table public.containers add column if not exists preview_offset_y integer not null default 0;
+alter table public.containers add column if not exists preview_rotation integer not null default 0;
 
 create table if not exists public.assets (
   id uuid primary key default gen_random_uuid(),

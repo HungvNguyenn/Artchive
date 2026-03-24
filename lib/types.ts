@@ -25,6 +25,13 @@ export type Asset = {
   position: Position;
 };
 
+export type PreviewSettings = {
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+  rotation: number;
+};
+
 export type ArtContainer = {
   id: string;
   userId: string;
@@ -36,6 +43,7 @@ export type ArtContainer = {
   createdAt: string;
   updatedAt: string;
   assets: Asset[];
+  preview: PreviewSettings;
 };
 
 export type Session = {

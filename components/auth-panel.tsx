@@ -51,14 +51,9 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
   return (
     <div className="panel auth-card">
       <div className="section">
-        <p className="eyebrow">Artchive</p>
-        <h1 className="title">Build your creative board, not your clutter.</h1>
-        <p className="subtitle">
-          Create artwork containers for your references, sketches, final images, and notes in one
-          corkboard-style workspace.
-        </p>
+        <h1 className="title">Artchive</h1>
       </div>
-      <div className="section">
+      <div className="section auth-toggle-row">
         <div className="pill-switch" role="tablist" aria-label="Authentication mode">
           <button
             className={mode === "signup" ? "active" : ""}
@@ -114,7 +109,6 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
         <button className="button" type="submit">
           {isSubmitting ? "Working..." : mode === "signup" ? "Create account" : "Log in"}
         </button>
-        <p className="helper">Your containers, notes, and uploads are stored under your account.</p>
         {feedback ? <p className="helper">{feedback}</p> : null}
       </form>
     </div>

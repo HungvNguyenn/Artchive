@@ -18,6 +18,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [containers, setContainers] = useState<ArtContainer[]>([]);
+  const [toolMode, setToolMode] = useState<"details" | "asset" | null>(null);
 
   async function refresh(userId: string) {
     try {
@@ -112,6 +113,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
       return;
     }
     await artchiveStore.deleteContainer(targetId);
+    setToolMode(null);
     router.push("/");
   }
 
@@ -127,8 +129,35 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
     if (!session || !container) {
       return;
     }
-    await artchiveStore.updateAssetPosition(container.id, assetId, x, y);
-    await refresh(session.user.id);
+
+    setContainers((current) =>
+      current.map((item) =>
+        item.id !== container.id
+          ? item
+          : {
+              ...item,
+              assets: item.assets.map((asset) =>
+                asset.id !== assetId
+                  ? asset
+                  : {
+                      ...asset,
+                      position: {
+                        ...asset.position,
+                        x,
+                        y
+                      }
+                    }
+              )
+            }
+      )
+    );
+
+    try {
+      await artchiveStore.updateAssetPosition(container.id, assetId, x, y);
+    } catch (error) {
+      console.error("Failed to save asset position", error);
+      await refresh(session.user.id);
+    }
   }
 
   if (!session) {
@@ -181,29 +210,49 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
                 <p className="eyebrow">Container board</p>
                 <h2 className="title">{container.name}</h2>
                 <p className="subtitle">
-                  Keep this page focused on the board itself: arrangement, notes, images, and
-                  project details.
+                  {container.description || "Add a summary to give this board some context."}
                 </p>
               </div>
               <div className="inline-actions">
                 <Link className="ghost-button" href="/">
                   Back to dashboard
                 </Link>
-                <Link className="button" href="/containers/new">
-                  New container
-                </Link>
+                <button className="ghost-button" type="button" onClick={() => setToolMode("details")}>
+                  Edit details
+                </button>
+                <button className="button" type="button" onClick={() => setToolMode("asset")}>
+                  Add asset
+                </button>
               </div>
             </div>
           </section>
           <BoardView container={container} onMoveAsset={handleMoveAsset} />
-          <DetailPanel
-            container={container}
-            onSave={handleSaveDetails}
-            onDelete={handleDeleteContainer}
-            onAddAsset={handleAddAsset}
-          />
         </main>
       </div>
+      {toolMode ? (
+        <div className="modal-overlay" onClick={() => setToolMode(null)}>
+          <div className="modal-shell" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">{toolMode === "details" ? "Container details" : "Add asset"}</p>
+                <h3 className="card-title">
+                  {toolMode === "details" ? "Update this container" : "Pin something new"}
+                </h3>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setToolMode(null)}>
+                Close
+              </button>
+            </div>
+            <DetailPanel
+              container={container}
+              onSave={handleSaveDetails}
+              onDelete={handleDeleteContainer}
+              onAddAsset={handleAddAsset}
+              mode={toolMode}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

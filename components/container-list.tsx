@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ArtContainer } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -6,6 +7,14 @@ type ContainerListProps = {
   selectedContainerId: string | null;
   onSelect: (containerId: string) => void;
 };
+
+function getPreviewImage(container: ArtContainer) {
+  return (
+    container.assets.find((asset) => asset.isPrimary && asset.imageUrl)?.imageUrl ||
+    container.assets.find((asset) => asset.imageUrl)?.imageUrl ||
+    null
+  );
+}
 
 export function ContainerList({
   containers,
@@ -28,33 +37,64 @@ export function ContainerList({
             <p className="helper">Try a different search or start a new artwork container.</p>
           </div>
         ) : null}
-        {containers.map((container) => (
-          <button
-            key={container.id}
-            type="button"
-            className={`container-item ${selectedContainerId === container.id ? "active" : ""}`}
-            onClick={() => onSelect(container.id)}
-          >
-            <div className="container-head">
-              <div>
-                <h4 className="container-name">{container.name}</h4>
-                <p className="meta">
-                  {container.medium || "Medium TBD"} • {container.status}
-                </p>
+        {containers.map((container) => {
+          const previewImage = getPreviewImage(container);
+
+          return (
+            <button
+              key={container.id}
+              type="button"
+              className={`container-item ${selectedContainerId === container.id ? "active" : ""}`}
+              onClick={() => onSelect(container.id)}
+            >
+              <div className="container-preview">
+                {previewImage ? (
+                  <Image
+                    alt={container.name}
+                    src={previewImage}
+                    fill
+                    unoptimized
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: `${50 + container.preview.offsetX}% ${50 + container.preview.offsetY}%`,
+                      transform: `scale(${container.preview.scale}) rotate(${container.preview.rotation}deg)`
+                    }}
+                  />
+                ) : (
+                  <div className="container-preview-fallback">
+                    <span>{container.name.slice(0, 1)}</span>
+                  </div>
+                )}
               </div>
-              <p className="meta">{formatDate(container.updatedAt)}</p>
-            </div>
-            <p className="meta">{container.description || "No description yet."}</p>
-            <div className="tag-row">
-              {container.tags.length === 0 ? <span className="tag">No tags</span> : null}
-              {container.tags.map((tag) => (
-                <span className="tag" key={tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </button>
-        ))}
+
+              <div className="container-head">
+                <div>
+                  <h4 className="container-name">{container.name}</h4>
+                  <p className="meta">
+                    {container.medium || "Medium TBD"} {"•"} {container.status}
+                  </p>
+                </div>
+                <div className="container-dates">
+                  <p className="meta">Created {formatDate(container.createdAt)}</p>
+                  <p className="meta">Updated {formatDate(container.updatedAt)}</p>
+                </div>
+              </div>
+
+              <p className="meta container-description">
+                {container.description || "No description yet."}
+              </p>
+
+              <div className="tag-row">
+                {container.tags.length === 0 ? <span className="tag">No tags</span> : null}
+                {container.tags.map((tag) => (
+                  <span className="tag" key={tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

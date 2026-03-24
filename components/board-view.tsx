@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PointerEvent, useRef } from "react";
+import { PointerEvent, useEffect, useMemo, useState } from "react";
 import { ArtContainer } from "@/lib/types";
 import { assetLabel, sortAssets } from "@/lib/utils";
 
@@ -18,11 +18,33 @@ type DragState = {
   height: number;
 } | null;
 
-export function BoardView({ container, onMoveAsset }: BoardViewProps) {
-  const boardRef = useRef<HTMLDivElement | null>(null);
-  const dragState = useRef<DragState>(null);
+type PositionMap = Record<
+  string,
+  {
+    x: number;
+    y: number;
+  }
+>;
 
-  function handlePointerDown(
+export function BoardView({ container, onMoveAsset }: BoardViewProps) {
+  const [dragState, setDragState] = useState<DragState>(null);
+  const [positions, setPositions] = useState<PositionMap>({});
+
+  const sortedAssets = useMemo(() => (container ? sortAssets(container.assets) : []), [container]);
+
+  useEffect(() => {
+    const nextPositions: PositionMap = {};
+    for (const asset of sortedAssets) {
+      nextPositions[asset.id] = {
+        x: asset.position.x,
+        y: asset.position.y
+      };
+    }
+    setPositions(nextPositions);
+    setDragState(null);
+  }, [sortedAssets]);
+
+  function handleAssetClick(
     event: PointerEvent<HTMLDivElement>,
     assetId: string,
     x: number,
@@ -30,41 +52,61 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
     width: number,
     height: number
   ) {
-    const board = boardRef.current;
+    const board = event.currentTarget.parentElement;
     if (!board) {
       return;
     }
+
+    event.stopPropagation();
+
+    if (dragState?.assetId === assetId) {
+      void onMoveAsset(assetId, positions[assetId]?.x ?? x, positions[assetId]?.y ?? y);
+      setDragState(null);
+      return;
+    }
+
     const rect = board.getBoundingClientRect();
-    dragState.current = {
+    setDragState({
       assetId,
       offsetX: event.clientX - rect.left - x,
       offsetY: event.clientY - rect.top - y,
       width,
       height
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    });
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
-    const board = boardRef.current;
-    const drag = dragState.current;
-    if (!board || !drag) {
+    if (!dragState) {
       return;
     }
-    const rect = board.getBoundingClientRect();
+
+    const rect = event.currentTarget.getBoundingClientRect();
     const x = Math.max(
       8,
-      Math.min(rect.width - drag.width - 8, event.clientX - rect.left - drag.offsetX)
+      Math.min(rect.width - dragState.width - 8, event.clientX - rect.left - dragState.offsetX)
     );
     const y = Math.max(
       8,
-      Math.min(rect.height - drag.height - 8, event.clientY - rect.top - drag.offsetY)
+      Math.min(rect.height - dragState.height - 8, event.clientY - rect.top - dragState.offsetY)
     );
-    onMoveAsset(drag.assetId, Math.round(x), Math.round(y));
+
+    setPositions((current) => ({
+      ...current,
+      [dragState.assetId]: {
+        x: Math.round(x),
+        y: Math.round(y)
+      }
+    }));
   }
 
-  function handlePointerUp() {
-    dragState.current = null;
+  function handleBoardClick() {
+    if (!dragState) {
+      return;
+    }
+
+    const nextPosition = positions[dragState.assetId];
+    void onMoveAsset(dragState.assetId, nextPosition.x, nextPosition.y);
+    setDragState(null);
   }
 
   return (
@@ -82,10 +124,9 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
         </div>
       </div>
       <div
-        ref={boardRef}
-        className="board-surface"
+        className={`board-surface ${dragState ? "drag-armed" : ""}`}
         onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+        onClick={handleBoardClick}
       >
         {!container ? (
           <div className="board-empty">
@@ -106,25 +147,27 @@ export function BoardView({ container, onMoveAsset }: BoardViewProps) {
         ) : null}
 
         {container
-          ? sortAssets(container.assets).map((asset, index) => (
+          ? sortedAssets.map((asset, index) => (
               <div
                 key={asset.id}
-                className={`asset-card ${asset.isPrimary ? "primary" : ""}`}
-                onPointerDown={(event) =>
-                  handlePointerDown(
+                className={`asset-card ${asset.isPrimary ? "primary" : ""} ${
+                  dragState?.assetId === asset.id ? "active-drag" : ""
+                }`}
+                onClick={(event) =>
+                  handleAssetClick(
                     event,
                     asset.id,
-                    asset.position.x,
-                    asset.position.y,
-                    asset.isPrimary ? 360 : 220,
-                    asset.isPrimary ? 360 : 236
+                    positions[asset.id]?.x ?? asset.position.x,
+                    positions[asset.id]?.y ?? asset.position.y,
+                    asset.isPrimary ? 420 : 220,
+                    asset.isPrimary ? 560 : 236
                   )
                 }
                 style={{
-                  left: asset.position.x,
-                  top: asset.position.y,
+                  left: positions[asset.id]?.x ?? asset.position.x,
+                  top: positions[asset.id]?.y ?? asset.position.y,
                   transform: `rotate(${asset.position.rotation}deg)`,
-                  zIndex: index + 1
+                  zIndex: dragState?.assetId === asset.id ? sortedAssets.length + 2 : index + 1
                 }}
               >
                 <span

@@ -1,8 +1,9 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
+import { TagInput } from "@/components/tag-input";
 import { CreateContainerInput } from "@/lib/types";
-import { normalizeTags, readFileAsDataUrl } from "@/lib/utils";
+import { readFileAsDataUrl } from "@/lib/utils";
 
 type ContainerFormProps = {
   onCreate: (input: CreateContainerInput) => void | Promise<void>;
@@ -20,7 +21,6 @@ const defaultState: CreateContainerInput = {
 
 export function ContainerForm({ onCreate }: ContainerFormProps) {
   const [form, setForm] = useState(defaultState);
-  const [rawTags, setRawTags] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -47,11 +47,9 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
       name: form.name.trim(),
       description: form.description.trim(),
       medium: form.medium.trim(),
-      tags: normalizeTags(rawTags),
       mainSketchTitle: form.mainSketchTitle.trim() || `${form.name.trim()} Main Sketch`
     });
     setForm(defaultState);
-    setRawTags("");
     setIsSubmitting(false);
   }
 
@@ -104,11 +102,10 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
             <option value="Archived">Archived</option>
           </select>
         </div>
-        <input
-          className="input"
-          placeholder="Tags separated by commas"
-          value={rawTags}
-          onChange={(event) => setRawTags(event.target.value)}
+        <TagInput
+          tags={form.tags}
+          placeholder="Type a tag and press Enter"
+          onChange={(tags) => setForm((current) => ({ ...current, tags }))}
         />
         <div className="upload-zone form-grid">
           <div>

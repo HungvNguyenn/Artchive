@@ -14,13 +14,12 @@ export function Sidebar({
   onSignOut,
   activeView = "dashboard"
 }: SidebarProps) {
-  const assets = containers.reduce((count, container) => count + container.assets.length, 0);
   const unfinished = containers.filter((container) => container.status === "Unfinished").length;
+  const finished = containers.filter((container) => container.status === "Finished").length;
 
   return (
     <aside className="sidebar panel">
       <div className="brand-mark">
-        <div className="brand-seal" />
         <div>
           <p className="eyebrow">Welcome</p>
           <h1 className="card-title">{session.user.name}</h1>
@@ -35,18 +34,12 @@ export function Sidebar({
             <p className="stat-label">Containers</p>
           </div>
           <div className="stat-card">
-            <p className="stat-value">{assets}</p>
-            <p className="stat-label">Pinned assets</p>
+            <p className="stat-value">{finished}</p>
+            <p className="stat-label">Finished</p>
           </div>
           <div className="stat-card">
             <p className="stat-value">{unfinished}</p>
             <p className="stat-label">In progress</p>
-          </div>
-          <div className="stat-card">
-            <p className="stat-value">
-              {containers.length === 0 ? "0" : Math.round(assets / containers.length)}
-            </p>
-            <p className="stat-label">Avg per board</p>
           </div>
         </div>
       </div>

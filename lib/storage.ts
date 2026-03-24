@@ -13,6 +13,10 @@ type ContainerRow = {
   description: string;
   status: ArtContainer["status"];
   medium: string;
+  preview_scale?: number | null;
+  preview_offset_x?: number | null;
+  preview_offset_y?: number | null;
+  preview_rotation?: number | null;
   created_at: string;
   updated_at: string;
 };
@@ -151,6 +155,15 @@ function buildSessionFromSupabase(session: SupabaseSession | null) {
   return toSession(session.user, null);
 }
 
+function buildPreviewSettings(row: ContainerRow) {
+  return {
+    scale: row.preview_scale ?? 1,
+    offsetX: row.preview_offset_x ?? 0,
+    offsetY: row.preview_offset_y ?? 0,
+    rotation: row.preview_rotation ?? 0
+  };
+}
+
 async function attachAssetsAndTags(containers: ContainerRow[]) {
   const client = getClient();
   if (containers.length === 0) {
@@ -222,7 +235,8 @@ async function attachAssetsAndTags(containers: ContainerRow[]) {
     tags: Array.from(new Set(tagsByContainer.get(container.id) ?? [])),
     createdAt: container.created_at,
     updatedAt: container.updated_at,
-    assets: assetsByContainer.get(container.id) ?? []
+    assets: assetsByContainer.get(container.id) ?? [],
+    preview: buildPreviewSettings(container)
   }));
 }
 
@@ -372,7 +386,11 @@ export const artchiveStore = {
       name: input.name,
       description: input.description,
       status: input.status,
-      medium: input.medium
+      medium: input.medium,
+      preview_scale: 1,
+      preview_offset_x: 0,
+      preview_offset_y: 0,
+      preview_rotation: 0
     });
 
     if (containerError) {
@@ -439,7 +457,11 @@ export const artchiveStore = {
         name: nextContainer.name,
         description: nextContainer.description,
         status: nextContainer.status,
-        medium: nextContainer.medium
+        medium: nextContainer.medium,
+        preview_scale: nextContainer.preview.scale,
+        preview_offset_x: nextContainer.preview.offsetX,
+        preview_offset_y: nextContainer.preview.offsetY,
+        preview_rotation: nextContainer.preview.rotation
       })
       .eq("id", containerId);
 
