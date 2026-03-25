@@ -193,7 +193,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
         <p className="eyebrow">Corkboard</p>
         <div className="row-between">
           <div>
-            <h3 className="card-title">{container?.name ?? "Select a container to open its board"}</h3>
+            <h3 className="card-title">{container?.name ?? "Select a board to open"}</h3>
             <p className="helper">Click and drag to move an item. Drag the bottom-right corner to resize images. Double-click any item to edit it.</p>
           </div>
           {container ? <div className="tag">{container.assets.length} assets</div> : null}
@@ -210,7 +210,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
           <div className="board-empty">
             <h4 className="card-title">Your corkboard will appear here</h4>
             <p className="helper">
-              Pick a container on the left, then pin notes, references, sketches, or final pieces.
+              Pick a board on the left, then pin notes, references, sketches, or final pieces.
             </p>
           </div>
         ) : null}
@@ -228,7 +228,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
           ? sortedAssets.map((asset, index) => (
               <div
                 key={asset.id}
-                className={`asset-card ${asset.isPrimary ? "primary" : ""} ${
+                className={`asset-card ${asset.isPrimary ? "primary" : ""} ${asset.type === "note" ? "note-card" : ""} ${
                   dragState?.assetId === asset.id ? "active-drag" : ""
                 }`}
                 onPointerDown={(event) =>
@@ -277,10 +277,10 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
                   </>
                 ) : null}
                 <h4 className="asset-title">{asset.title}</h4>
-                {asset.note ? <p className="asset-note">{asset.note}</p> : null}
                 <p className="asset-meta">
                   {asset.isPrimary ? "Primary sketch" : assetLabel(asset.type)}
                 </p>
+                {asset.note ? <p className="asset-note">{asset.note}</p> : null}
               </div>
             ))
           : null}

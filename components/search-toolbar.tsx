@@ -28,9 +28,10 @@ export function SearchToolbar({
       <div className="toolbar" style={{ marginTop: 22 }}>
         <input
           className="input"
-          placeholder="Search containers, ideas, or mediums"
+          placeholder="Search boards, ideas, or mediums"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
+          spellCheck={false}
         />
         <select
           className="select"

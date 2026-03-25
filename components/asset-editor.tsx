@@ -123,6 +123,7 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         placeholder="Asset title"
+        spellCheck={false}
       />
       <select
         className="select"
@@ -141,6 +142,7 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
           value={note}
           onChange={(event) => setNote(event.target.value)}
           placeholder="Add note text"
+          spellCheck={false}
         />
       ) : null}
       {type !== "note" ? (

@@ -8,7 +8,7 @@ export default function NotFound() {
           <p className="eyebrow">Artchive</p>
           <h1 className="title">That page isn’t on the board.</h1>
           <p className="subtitle">
-            The route may have moved, or the container you were looking for no longer exists.
+            The route may have moved, or the board you were looking for no longer exists.
           </p>
         </div>
         <div className="inline-actions">

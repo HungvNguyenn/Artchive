@@ -26,15 +26,15 @@ export function ContainerList({
       <div className="row-between">
         <div>
           <p className="eyebrow">Library</p>
-          <h3 className="card-title">Your containers</h3>
+          <h3 className="card-title">Your boards</h3>
         </div>
         <p className="helper">{containers.length} visible</p>
       </div>
       <div className="container-list" style={{ marginTop: 16 }}>
         {containers.length === 0 ? (
           <div className="empty-state">
-            <h4 className="card-title">No matching containers</h4>
-            <p className="helper">Try a different search or start a new artwork container.</p>
+            <h4 className="card-title">No matching boards</h4>
+            <p className="helper">Try a different search or start a new artwork board.</p>
           </div>
         ) : null}
         {containers.map((container) => {

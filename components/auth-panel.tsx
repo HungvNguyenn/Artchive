@@ -80,6 +80,7 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
               placeholder="Mira Sol"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              spellCheck={false}
             />
           </label>
         ) : null}
@@ -91,6 +92,7 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
             placeholder="artist@example.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            spellCheck={false}
             required
           />
         </label>
@@ -102,6 +104,7 @@ export function AuthPanel({ onSubmit }: AuthPanelProps) {
             placeholder="At least 6 characters"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            spellCheck={false}
             minLength={6}
             required
           />

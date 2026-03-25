@@ -61,6 +61,7 @@ export function TagInput({ tags, placeholder = "Type a tag and press Enter", onC
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={handleKeyDown}
+        spellCheck={false}
       />
     </div>
   );

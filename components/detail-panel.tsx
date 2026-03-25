@@ -207,6 +207,7 @@ export function DetailPanel({
             onChange={(event) =>
               setDraft((current) => (current ? { ...current, name: event.target.value } : current))
             }
+            spellCheck={false}
           />
           <textarea
             className="textarea"
@@ -217,6 +218,7 @@ export function DetailPanel({
                 current ? { ...current, description: event.target.value } : current
               )
             }
+            spellCheck={false}
           />
           <div className="split">
             <input
@@ -228,6 +230,7 @@ export function DetailPanel({
                 )
               }
               placeholder="Medium"
+              spellCheck={false}
             />
             <select
               className="select"
@@ -410,6 +413,7 @@ export function DetailPanel({
             placeholder="Asset title"
             value={assetTitle}
             onChange={(event) => setAssetTitle(event.target.value)}
+            spellCheck={false}
             required
           />
           <select
@@ -428,6 +432,7 @@ export function DetailPanel({
               placeholder="Capture reasoning, palette choices, reminders, or assignment notes."
               value={assetNote}
               onChange={(event) => setAssetNote(event.target.value)}
+              spellCheck={false}
             />
           ) : (
             <label className="upload-zone form-grid">

@@ -138,7 +138,7 @@ export function DashboardPage() {
             tags={allTags}
             onQueryChange={setQuery}
             onTagChange={setTagFilter}
-            actionLabel="Create container"
+            actionLabel="Create board"
             onAction={() => router.push("/containers/new")}
           />
           <ContainerList

@@ -56,7 +56,7 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
   return (
     <section className="card">
       <div className="section">
-        <p className="eyebrow">New container</p>
+        <p className="eyebrow">New board</p>
         <h3 className="card-title">Start an artwork space</h3>
         <p className="helper">
           Give each piece one home for references, process notes, and finished work.
@@ -65,9 +65,10 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
       <form className="form-grid" onSubmit={handleSubmit}>
         <input
           className="input"
-          placeholder="Container name"
+          placeholder="Board name"
           value={form.name}
           onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+          spellCheck={false}
           required
         />
         <textarea
@@ -77,6 +78,7 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
           onChange={(event) =>
             setForm((current) => ({ ...current, description: event.target.value }))
           }
+          spellCheck={false}
         />
         <div className="split">
           <input
@@ -86,6 +88,7 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
             onChange={(event) =>
               setForm((current) => ({ ...current, medium: event.target.value }))
             }
+            spellCheck={false}
           />
           <select
             className="select"
@@ -111,7 +114,7 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
           <div>
             <p className="section-title">Required main sketch</p>
             <p className="helper">
-              Every container starts with one large primary sketch that anchors the corkboard.
+              Every board starts with one large primary sketch that anchors the corkboard.
             </p>
           </div>
           <input
@@ -121,16 +124,17 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
             onChange={(event) =>
               setForm((current) => ({ ...current, mainSketchTitle: event.target.value }))
             }
+            spellCheck={false}
             required
           />
           <input type="file" accept="image/*" onChange={handleFileChange} required />
           <p className="helper tiny">
             Upload the sketch you want featured first. Notes and references can be added after the
-            container opens.
+            board opens.
           </p>
         </div>
         <button className="button" type="submit" disabled={isSubmitting || !form.mainSketchUrl}>
-          {isSubmitting ? "Creating..." : "Create container"}
+          {isSubmitting ? "Creating..." : "Create board"}
         </button>
       </form>
     </section>

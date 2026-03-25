@@ -163,20 +163,20 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
         item.id !== container.id
           ? item
           : {
-              ...item,
-              assets: item.assets.map((asset) =>
-                asset.id !== assetId
-                  ? asset
-                  : {
-                      ...asset,
-                      position: {
-                        ...asset.position,
-                        x,
-                        y
-                    }
+            ...item,
+            assets: item.assets.map((asset) =>
+              asset.id !== assetId
+                ? asset
+                : {
+                  ...asset,
+                  position: {
+                    ...asset.position,
+                    x,
+                    y
                   }
-              )
-            }
+                }
+            )
+          }
       )
     );
 
@@ -198,16 +198,16 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
         item.id !== container.id
           ? item
           : {
-              ...item,
-              assets: item.assets.map((asset) =>
-                asset.id !== assetId
-                  ? asset
-                  : {
-                      ...asset,
-                      displayWidth
-                    }
-              )
-            }
+            ...item,
+            assets: item.assets.map((asset) =>
+              asset.id !== assetId
+                ? asset
+                : {
+                  ...asset,
+                  displayWidth
+                }
+            )
+          }
       )
     );
 
@@ -266,7 +266,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           <section className="panel hero-card">
             <div className="row-between">
               <div className="hero-copy">
-                <p className="eyebrow">Container board</p>
+                <p className="eyebrow">Board</p>
                 <h2 className="title">{container.name}</h2>
                 <p className="subtitle">
                   {container.description || "Add a summary to give this board some context."}

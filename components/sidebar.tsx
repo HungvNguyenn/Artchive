@@ -31,7 +31,7 @@ export function Sidebar({
         <div className="stats-grid">
           <div className="stat-card">
             <p className="stat-value">{containers.length}</p>
-            <p className="stat-label">Containers</p>
+            <p className="stat-label">Boards</p>
           </div>
           <div className="stat-card">
             <p className="stat-value">{finished}</p>
