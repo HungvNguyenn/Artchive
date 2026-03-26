@@ -324,6 +324,10 @@ img {
   max-width: 64ch;
 }
 
+.board-dates {
+  margin-top: 8px;
+}
+
 .hero-actions,
 .inline-actions {
   display: flex;
@@ -450,9 +454,7 @@ img {
   align-content: start;
   text-align: left;
   position: relative;
-  /* ORIGINAL OFFSETS */
-  padding-top: 88px;
-  min-height: 220px;
+  min-height: 200px;
   transition: transform 0.1s;
   transform: rotate(-1.5deg);
 }
@@ -502,12 +504,20 @@ img {
   align-items: flex-start;
 }
 
+.container-head {
+  flex-wrap: wrap;
+}
+
+.container-head > div:first-child {
+  min-width: 0;
+  flex: 1 1 180px;
+}
+
 .container-preview {
-  position: absolute;
-  top: 16px;
-  left: 16px;
+  position: relative;
   width: 74px;
   height: 74px;
+  flex: 0 0 74px;
   overflow: hidden;
   background: var(--bg);
   border: 2px solid var(--ink);
@@ -544,37 +554,35 @@ img {
 .container-description {
   min-height: 0;
   line-height: 1.35;
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 0.8vw + 0.75rem, 1.05rem);
   color: var(--ink);
 }
 
 .container-body {
   display: grid;
-  gap: 10px;
-  padding-left: 86px;
+  gap: 8px;
+}
+
+.container-top {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
 }
 
 .container-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: auto;
-}
-
-.container-created {
-  flex-shrink: 0;
-  text-align: right;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-weight: bold;
 }
 
 .container-name,
 .card-title {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 0.95vw + 0.8rem, 1.2rem);
   font-weight: 900;
   color: var(--ink);
   font-family: var(--font-body);
@@ -583,9 +591,10 @@ img {
 .meta {
   margin: 0;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 0.65vw + 0.72rem, 1rem);
   font-weight: bold;
   font-family: var(--font-display);
+  line-height: 1.25;
 }
 
 .tag-row {
@@ -1149,6 +1158,20 @@ img {
   .sidebar {
     position: static;
   }
+
+  .container-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 1500px) {
+  .container-list {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .container-item {
+    min-height: 190px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1169,6 +1192,10 @@ img {
 
   .container-body {
     padding-left: 0;
+  }
+
+  .container-top {
+    grid-template-columns: 1fr;
   }
 
   .board-surface {

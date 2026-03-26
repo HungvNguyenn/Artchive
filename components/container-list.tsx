@@ -47,35 +47,37 @@ export function ContainerList({
               className={`container-item ${selectedContainerId === container.id ? "active" : ""}`}
               onClick={() => onSelect(container.id)}
             >
-              <div className="container-preview">
-                {previewImage ? (
-                  <Image
-                    alt={container.name}
-                    src={previewImage}
-                    fill
-                    unoptimized
-                    style={{
-                      objectFit: "cover",
-                      objectPosition: `${50 + container.preview.offsetX}% ${50 + container.preview.offsetY}%`,
-                      transform: `scale(${container.preview.scale})`
-                    }}
-                  />
-                ) : (
-                  <div className="container-preview-fallback">
-                    <span>{container.name.slice(0, 1)}</span>
-                  </div>
-                )}
-              </div>
-
               <div className="container-body">
-                <div className="container-head">
-                  <div>
-                    <h4 className="container-name">{container.name}</h4>
-                    <p className="meta">
-                      {container.medium || "Medium TBD"} {"•"} {container.status}
-                    </p>
+                <div className="container-top">
+                  <div className="container-preview">
+                    {previewImage ? (
+                      <Image
+                        alt={container.name}
+                        src={previewImage}
+                        fill
+                        unoptimized
+                        style={{
+                          objectFit: "cover",
+                          objectPosition: `${50 + container.preview.offsetX}% ${50 + container.preview.offsetY}%`,
+                          transform: `scale(${container.preview.scale})`
+                        }}
+                      />
+                    ) : (
+                      <div className="container-preview-fallback">
+                        <span>{container.name.slice(0, 1)}</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="meta">Updated {formatDate(container.updatedAt)}</p>
+
+                  <div className="container-head">
+                    <div>
+                      <h4 className="container-name">{container.name}</h4>
+                      <p className="meta">Updated {formatDate(container.updatedAt)}</p>
+                      <p className="meta">
+                        {container.medium || "Medium TBD"} {"•"} {container.status}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <p className="meta container-description">
@@ -91,7 +93,6 @@ export function ContainerList({
                       </span>
                     ))}
                   </div>
-                  <p className="meta container-created">Created {formatDate(container.createdAt)}</p>
                 </div>
               </div>
             </button>

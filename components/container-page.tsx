@@ -10,6 +10,7 @@ import { DetailPanel } from "@/components/detail-panel";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
 import { ArtContainer, Asset, CreateAssetInput, Session } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 type ContainerPageProps = {
   containerId: string;
@@ -270,6 +271,9 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
                 <h2 className="title">{container.name}</h2>
                 <p className="subtitle">
                   {container.description || "Add a summary to give this board some context."}
+                </p>
+                <p className="meta board-dates">
+                  Updated {formatDate(container.updatedAt)} {"•"} Created {formatDate(container.createdAt)}
                 </p>
               </div>
               <div className="inline-actions">
