@@ -265,7 +265,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
         />
         <main className="main">
           <section className="panel hero-card">
-            <div className="row-between">
+            <div className="row-between board-hero-row">
               <div className="hero-copy">
                 <p className="eyebrow">Board</p>
                 <h2 className="title">{container.name}</h2>
@@ -276,7 +276,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
                   Updated {formatDate(container.updatedAt)} {"•"} Created {formatDate(container.createdAt)}
                 </p>
               </div>
-              <div className="inline-actions">
+              <div className="inline-actions board-actions">
                 <Link className="ghost-button" href="/">
                   Back to dashboard
                 </Link>
