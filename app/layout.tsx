@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,6 +14,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   return (
     <html
       lang="en"
@@ -27,7 +32,13 @@ export default function RootLayout({
         data-enable-grammarly="false"
         data-lt-active="false"
       >
+        {measurementId ? (
+          <Suspense fallback={null}>
+            <GoogleAnalytics measurementId={measurementId} />
+          </Suspense>
+        ) : null}
         {children}
+        <VercelAnalytics />
       </body>
     </html>
   );
