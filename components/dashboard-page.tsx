@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthPanel } from "@/components/auth-panel";
+import { trackAnalyticsEvent } from "@/components/google-analytics";
 import { ContainerList } from "@/components/container-list";
 import { SearchToolbar } from "@/components/search-toolbar";
 import { Sidebar } from "@/components/sidebar";
@@ -87,6 +88,7 @@ export function DashboardPage() {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
+          trackAnalyticsEvent("sign_up", { method: "email" });
           setSession(result.session);
           setContainers([]);
           void loadContainersForUser(result.session.user.id);

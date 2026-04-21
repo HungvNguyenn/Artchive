@@ -15,6 +15,8 @@ type GoogleAnalyticsProps = {
   measurementId: string;
 };
 
+type AnalyticsEventParams = Record<string, string | number | boolean | null | undefined>;
+
 function trackPageView(url: string) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") {
     return;
@@ -25,6 +27,14 @@ function trackPageView(url: string) {
     page_path: url,
     page_title: document.title
   });
+}
+
+export function trackAnalyticsEvent(eventName: string, params: AnalyticsEventParams = {}) {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") {
+    return;
+  }
+
+  window.gtag("event", eventName, params);
 }
 
 export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {

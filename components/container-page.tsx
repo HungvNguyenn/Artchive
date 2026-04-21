@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AssetEditor } from "@/components/asset-editor";
 import { AuthPanel } from "@/components/auth-panel";
 import { BoardView } from "@/components/board-view";
+import { trackAnalyticsEvent } from "@/components/google-analytics";
 import { DetailPanel } from "@/components/detail-panel";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
@@ -80,6 +81,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
+          trackAnalyticsEvent("sign_up", { method: "email" });
           setSession(result.session);
           setContainers([]);
           void refresh(result.session.user.id);
