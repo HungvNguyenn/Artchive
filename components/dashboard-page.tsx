@@ -98,6 +98,7 @@ export function DashboardPage() {
 
       const nextSession = await artchiveStore.signIn(input.email, input.password);
       if (nextSession) {
+        trackAnalyticsEvent("login", { method: "email" });
         setSession(nextSession);
         setContainers([]);
         void loadContainersForUser(nextSession.user.id);

@@ -79,6 +79,7 @@ export function CreateContainerPage() {
 
       const nextSession = await artchiveStore.signIn(input.email, input.password);
       if (nextSession) {
+        trackAnalyticsEvent("login", { method: "email" });
         setSession(nextSession);
         setContainers([]);
         void loadContainersForUser(nextSession.user.id);
@@ -101,6 +102,11 @@ export function CreateContainerPage() {
       return;
     }
     const created = await artchiveStore.createContainer(session.user.id, input);
+    trackAnalyticsEvent("create_container", {
+      status: created.status,
+      tag_count: created.tags.length,
+      asset_count: created.assets.length
+    });
     router.push(`/containers/${created.id}`);
   }
 

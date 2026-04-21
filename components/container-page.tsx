@@ -92,6 +92,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
 
       const nextSession = await artchiveStore.signIn(input.email, input.password);
       if (nextSession) {
+        trackAnalyticsEvent("login", { method: "email" });
         setSession(nextSession);
         setContainers([]);
         void refresh(nextSession.user.id);
@@ -130,7 +131,12 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
     if (!session) {
       return;
     }
-    await artchiveStore.addAsset(input);
+    const createdAsset = await artchiveStore.addAsset(input);
+    if (createdAsset) {
+      trackAnalyticsEvent("add_asset", {
+        asset_type: createdAsset.type
+      });
+    }
     await refresh(session.user.id);
   }
 
