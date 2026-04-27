@@ -54,7 +54,7 @@ export function Sidebar({
             className={`nav-link ${activeView === "create" ? "active" : ""}`}
             href="/containers/new"
           >
-            New container
+            New board
           </Link>
         </div>
       </div>

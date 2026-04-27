@@ -421,7 +421,7 @@ export const artchiveStore = {
     const containers = await this.listContainers(userId);
     const created = containers.find((container) => container.id === containerId);
     if (!created) {
-      throw new Error("Container was created but could not be loaded.");
+      throw new Error("Board was created but could not be loaded.");
     }
     return created;
   },

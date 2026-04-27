@@ -1,6 +1,6 @@
 # Artchive
 
-Artchive is a Web application designed to help many artist keep track of their reference photos, notes, and sketches all in one place. Each drawing has a container that holds anything related to that art piece together. This allows everything to be together without the hassle of looking at different sites. 
+Artchive is a Web application designed to help many artist keep track of their reference photos, notes, and sketches all in one place. Each drawing has a board that holds anything related to that art piece together. This allows everything to be together without the hassle of looking at different sites. 
 
 ## Features
 - Upload and organize sketches, reference images, and final artwork
@@ -40,7 +40,7 @@ Artchive is a Web application designed to help many artist keep track of their r
 
 ## Architecture
 
-Artchive uses Next.js for the frontend and Supabase for authentication, database, and image storage. Users can create containers for artwork, upload assets, add notes, and manage everything in a corkboard-style workspace.
+Artchive uses Next.js for the frontend and Supabase for authentication, database, and image storage. Users can create boards for artwork, upload assets, add notes, and manage everything in a corkboard-style workspace.
 
 ## License
 

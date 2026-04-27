@@ -165,7 +165,7 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
       ) : null}
       {asset.isPrimary ? (
         <p className="helper">
-          The primary sketch can be renamed here, but deletion is disabled so each container keeps
+          The primary sketch can be renamed here, but deletion is disabled so each board keeps
           its anchor image.
         </p>
       ) : (

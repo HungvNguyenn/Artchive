@@ -130,7 +130,7 @@ export function CreateContainerPage() {
           <section className="panel hero-card">
             <div className="row-between">
               <div className="hero-copy">
-                <p className="eyebrow">Create container</p>
+                <p className="eyebrow">Create board</p>
                 <h2 className="title">Start one artwork at a time.</h2>
                 <p className="subtitle">
                   Set up the basic project info here, then drop into the corkboard to pin notes,

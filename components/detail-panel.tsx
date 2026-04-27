@@ -91,7 +91,7 @@ export function DetailPanel({
       });
       setDetailsFeedback("Changes saved.");
     } catch (error) {
-      setDetailsFeedback(error instanceof Error ? error.message : "Could not save container details.");
+      setDetailsFeedback(error instanceof Error ? error.message : "Could not save board details.");
     } finally {
       setIsSavingDetails(false);
     }
@@ -178,8 +178,8 @@ export function DetailPanel({
     return (
       <section className="card">
         <div className="empty-state">
-          <h3 className="card-title">No container selected</h3>
-          <p className="helper">Select or create a container to manage its notes, tags, and assets.</p>
+          <h3 className="card-title">No board selected</h3>
+          <p className="helper">Select or create a board to manage its notes, tags, and assets.</p>
         </div>
       </section>
     );
@@ -191,7 +191,7 @@ export function DetailPanel({
         <form className="card form-grid" onSubmit={handleSaveDetails}>
           <div className="row-between">
             <div>
-              <p className="eyebrow">Container details</p>
+              <p className="eyebrow">Board details</p>
               <h3 className="card-title">Edit project</h3>
             </div>
             <div className="action-feedback">
@@ -319,7 +319,7 @@ export function DetailPanel({
               </div>
             ) : (
               <div className="preview-empty helper">
-                Add an image to this container first, then you can frame its dashboard preview here.
+                Add an image to this board first, then you can frame its dashboard preview here.
               </div>
             )}
             <label className="slider-field">
@@ -393,7 +393,7 @@ export function DetailPanel({
             </label>
           </div>
           <button className="danger-button" type="button" onClick={() => onDelete(draft.id)}>
-            Delete container
+            Delete board
           </button>
         </form>
       ) : null}

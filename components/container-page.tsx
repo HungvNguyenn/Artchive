@@ -247,7 +247,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           />
           <main className="main">
             <section className="card empty-state">
-              <h2 className="card-title">Container not found</h2>
+              <h2 className="card-title">Board not found</h2>
               <p className="helper">This artwork may have been deleted or belongs to another session.</p>
               <div className="inline-actions" style={{ justifyContent: "center", marginTop: 12 }}>
                 <Link className="ghost-button" href="/">
@@ -309,9 +309,9 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           <div className="modal-shell" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <p className="eyebrow">{toolMode === "details" ? "Container details" : "Add asset"}</p>
+                <p className="eyebrow">{toolMode === "details" ? "Board details" : "Add asset"}</p>
                 <h3 className="card-title">
-                  {toolMode === "details" ? "Update this container" : "Pin something new"}
+                  {toolMode === "details" ? "Update this board" : "Pin something new"}
                 </h3>
               </div>
               <button className="ghost-button" type="button" onClick={() => setToolMode(null)}>
