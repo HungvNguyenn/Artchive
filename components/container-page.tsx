@@ -81,7 +81,6 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
-          trackAnalyticsEvent("sign_up", { method: "email" });
           setSession(result.session);
           setContainers([]);
           void refresh(result.session.user.id);
