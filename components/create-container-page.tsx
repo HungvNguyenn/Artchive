@@ -8,6 +8,7 @@ import { trackAnalyticsEvent } from "@/components/google-analytics";
 import { ContainerForm } from "@/components/container-form";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
+import { createStarterBoardForUser } from "@/lib/starter-board";
 import { ArtContainer, CreateContainerInput, Session } from "@/lib/types";
 
 export function CreateContainerPage() {
@@ -68,6 +69,7 @@ export function CreateContainerPage() {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
+          await createStarterBoardForUser(result.session.user.id);
           setSession(result.session);
           setContainers([]);
           void loadContainersForUser(result.session.user.id);

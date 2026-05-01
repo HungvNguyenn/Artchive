@@ -8,6 +8,7 @@ import { ContainerList } from "@/components/container-list";
 import { SearchToolbar } from "@/components/search-toolbar";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
+import { createStarterBoardForUser } from "@/lib/starter-board";
 import { ArtContainer, Session } from "@/lib/types";
 
 export function DashboardPage() {
@@ -88,6 +89,7 @@ export function DashboardPage() {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
+          await createStarterBoardForUser(result.session.user.id);
           setSession(result.session);
           setContainers([]);
           void loadContainersForUser(result.session.user.id);

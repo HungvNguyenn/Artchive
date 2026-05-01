@@ -10,6 +10,7 @@ import { trackAnalyticsEvent } from "@/components/google-analytics";
 import { DetailPanel } from "@/components/detail-panel";
 import { Sidebar } from "@/components/sidebar";
 import { artchiveStore } from "@/lib/storage";
+import { createStarterBoardForUser } from "@/lib/starter-board";
 import { ArtContainer, Asset, CreateAssetInput, Session } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -81,6 +82,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
       if (input.mode === "signup") {
         const result = await artchiveStore.signUp(input.email, input.password, input.name || "");
         if (result.session) {
+          await createStarterBoardForUser(result.session.user.id);
           setSession(result.session);
           setContainers([]);
           void refresh(result.session.user.id);
