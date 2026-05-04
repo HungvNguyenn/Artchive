@@ -194,7 +194,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
         <div className="row-between">
           <div>
             <h3 className="card-title">{container?.name ?? "Select a board to open"}</h3>
-            <p className="helper">Click and drag to move an item. Drag the bottom-right corner to resize images. Double-click any item to edit it.</p>
+            <p className="helper">Click and drag to move an item. Drag either resize corner to scale images. Double-click any item to edit it.</p>
           </div>
           {container ? <div className="tag">{container.assets.length} assets</div> : null}
         </div>
@@ -265,6 +265,18 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
                     <button
                       aria-label={`Resize ${asset.title}`}
                       className="asset-resize-handle"
+                      type="button"
+                      onPointerDown={(event) =>
+                        handleResizePointerDown(
+                          event,
+                          asset.id,
+                          sizes[asset.id] ?? asset.displayWidth
+                        )
+                      }
+                    />
+                    <button
+                      aria-label={`Resize ${asset.title} from top left`}
+                      className="asset-resize-handle top-left"
                       type="button"
                       onPointerDown={(event) =>
                         handleResizePointerDown(

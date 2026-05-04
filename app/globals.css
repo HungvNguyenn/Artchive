@@ -849,6 +849,14 @@ img {
   background: var(--accent);
 }
 
+.asset-resize-handle.top-left {
+  left: 4px;
+  top: 4px;
+  right: auto;
+  bottom: auto;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
