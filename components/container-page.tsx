@@ -246,6 +246,7 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
             containers={containers}
             session={session}
             onSignOut={handleSignOut}
+            paletteAssets={[]}
           />
           <main className="main">
             <section className="card empty-state">
@@ -271,6 +272,8 @@ export function ContainerPage({ containerId }: ContainerPageProps) {
           containers={containers}
           session={session}
           onSignOut={handleSignOut}
+          paletteAssets={container.assets.filter((asset) => asset.type === "palette")}
+          onSelectAsset={setSelectedAssetId}
         />
         <main className="main">
           <section className="panel hero-card">

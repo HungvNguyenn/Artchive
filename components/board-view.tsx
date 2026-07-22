@@ -46,11 +46,14 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   const sortedAssets = useMemo(() => (container ? sortAssets(container.assets) : []), [container]);
-
+  const boardAssets = useMemo(
+    () => sortedAssets.filter((asset) => asset.type !== "palette"),
+    [sortedAssets]
+  );
   useEffect(() => {
     const nextPositions: PositionMap = {};
     const nextSizes: SizeMap = {};
-    for (const asset of sortedAssets) {
+    for (const asset of boardAssets) {
       nextPositions[asset.id] = {
         x: asset.position.x,
         y: asset.position.y
@@ -61,7 +64,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
     setSizes(nextSizes);
     setDragState(null);
     setResizeState(null);
-  }, [sortedAssets]);
+  }, [boardAssets]);
 
   function handlePointerDown(
     event: PointerEvent<HTMLDivElement>,
@@ -190,7 +193,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
   return (
     <section className="card board-card">
       <div className="board-header">
-        <p className="eyebrow">Corkboard</p>
+        <p className="eyebrow">Board</p>
         <div className="row-between">
           <div>
             <h3 className="card-title">{container?.name ?? "Select a board to open"}</h3>
@@ -208,14 +211,14 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
       >
         {!container ? (
           <div className="board-empty">
-            <h4 className="card-title">Your corkboard will appear here</h4>
+            <h4 className="card-title">Your board will appear here</h4>
             <p className="helper">
               Pick a board on the left, then pin notes, references, sketches, or final pieces.
             </p>
           </div>
         ) : null}
 
-        {container && container.assets.length === 0 ? (
+        {container && boardAssets.length === 0 ? (
           <div className="board-empty">
             <h4 className="card-title">Start pinning assets</h4>
             <p className="helper">
@@ -225,7 +228,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
         ) : null}
 
         {container
-          ? sortedAssets.map((asset, index) => (
+          ? boardAssets.map((asset, index) => (
               <div
                 key={asset.id}
                 className={`asset-card ${asset.isPrimary ? "primary" : ""} ${asset.type === "note" ? "note-card" : ""} ${
@@ -247,7 +250,7 @@ export function BoardView({ container, onMoveAsset, onResizeAsset, onSelectAsset
                   left: positions[asset.id]?.x ?? asset.position.x,
                   top: positions[asset.id]?.y ?? asset.position.y,
                   width: sizes[asset.id] ?? asset.displayWidth,
-                  zIndex: dragState?.assetId === asset.id ? sortedAssets.length + 2 : index + 1
+                  zIndex: dragState?.assetId === asset.id ? boardAssets.length + 2 : index + 1
                 }}
               >
                 <span

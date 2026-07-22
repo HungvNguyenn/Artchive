@@ -114,7 +114,7 @@ export function ContainerForm({ onCreate }: ContainerFormProps) {
           <div>
             <p className="section-title">Required main sketch</p>
             <p className="helper">
-              Every board starts with one large primary sketch that anchors the corkboard.
+              Every board starts with one large primary sketch that anchors the board.
             </p>
           </div>
           <input

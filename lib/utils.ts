@@ -23,8 +23,8 @@ export function sortAssets(assets: Asset[]) {
     if (leftPrimary !== rightPrimary) {
       return leftPrimary - rightPrimary;
     }
-    const leftWeight = left.type === "note" ? 1 : 0;
-    const rightWeight = right.type === "note" ? 1 : 0;
+    const leftWeight = left.type === "note" || left.type === "palette" ? 1 : 0;
+    const rightWeight = right.type === "note" || right.type === "palette" ? 1 : 0;
     if (leftWeight !== rightWeight) {
       return leftWeight - rightWeight;
     }

@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Artchive",
-  description: "A corkboard-style home for your artwork references, notes, sketches, and finished pieces."
+  description: "A board-style home for your artwork references, notes, sketches, and finished pieces."
 };
 
 export default function RootLayout({

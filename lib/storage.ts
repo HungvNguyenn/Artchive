@@ -54,7 +54,28 @@ function getClient(): any {
 }
 
 function makeUuid() {
-  return crypto.randomUUID();
+  const browserCrypto = globalThis.crypto;
+
+  if (typeof browserCrypto?.randomUUID === "function") {
+    return browserCrypto.randomUUID();
+  }
+
+  if (typeof browserCrypto?.getRandomValues === "function") {
+    const bytes = browserCrypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    return Array.from(bytes, (byte, index) => {
+      const value = byte.toString(16).padStart(2, "0");
+      return [4, 6, 8, 10].includes(index) ? `-${value}` : value;
+    }).join("");
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (token) => {
+    const random = Math.floor(Math.random() * 16);
+    const value = token === "x" ? random : (random & 0x3) | 0x8;
+    return value.toString(16);
+  });
 }
 
 function normalizeError(error: unknown) {
@@ -514,7 +535,7 @@ export const artchiveStore = {
 
     const assetId = makeUuid();
     const imagePath =
-      input.imageUrl && input.type !== "note"
+      input.imageUrl && input.type !== "note" && input.type !== "palette"
         ? await uploadImage(session.user.id, input.containerId, assetId, input.imageUrl)
         : null;
 
@@ -598,7 +619,7 @@ export const artchiveStore = {
 
     let nextImagePath = existingAsset?.image_path ?? null;
 
-    if (updates.type === "note") {
+    if (updates.type === "note" || updates.type === "palette") {
       nextImagePath = null;
     } else if (updates.imageUrl) {
       nextImagePath = await uploadImage(session.user.id, containerId, assetId, updates.imageUrl);
@@ -607,7 +628,7 @@ export const artchiveStore = {
     const payload = {
       title: updates.title,
       type: updates.type,
-      note: updates.type === "note" ? updates.note ?? null : updates.note ?? null,
+      note: updates.note ?? null,
       image_path: nextImagePath
     };
 
@@ -624,7 +645,7 @@ export const artchiveStore = {
     if (
       existingAsset?.image_path &&
       existingAsset.image_path !== nextImagePath &&
-      (updates.type === "note" || Boolean(updates.imageUrl))
+      (updates.type === "note" || updates.type === "palette" || Boolean(updates.imageUrl))
     ) {
       const { error: removeError } = await client.storage
         .from(BUCKET_NAME)

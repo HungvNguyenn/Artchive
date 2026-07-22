@@ -135,7 +135,7 @@ export function CreateContainerPage() {
                 <p className="eyebrow">Create board</p>
                 <h2 className="title">Start one artwork at a time.</h2>
                 <p className="subtitle">
-                  Set up the basic project info here, then drop into the corkboard to pin notes,
+                  Set up the basic project info here, then drop into the board to pin notes,
                   references, sketches, and finals.
                 </p>
               </div>

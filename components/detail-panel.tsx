@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { ChangeEvent, FormEvent, PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import { PaletteEditor } from "@/components/palette-editor";
 import { TagInput } from "@/components/tag-input";
+import { normalizePaletteInput } from "@/lib/palette";
 import { ArtContainer, CreateAssetInput } from "@/lib/types";
 import { readFileAsDataUrl } from "@/lib/utils";
 
@@ -25,6 +27,7 @@ export function DetailPanel({
   const [assetTitle, setAssetTitle] = useState("");
   const [assetType, setAssetType] = useState<CreateAssetInput["type"]>("reference");
   const [assetNote, setAssetNote] = useState("");
+  const [assetPalette, setAssetPalette] = useState("");
   const [assetImage, setAssetImage] = useState<string | undefined>(undefined);
   const [assetFeedback, setAssetFeedback] = useState("");
   const [detailsFeedback, setDetailsFeedback] = useState("");
@@ -49,6 +52,13 @@ export function DetailPanel({
       null
     );
   }, [draft]);
+  const hasPaletteAsset = Boolean(container?.assets.some((asset) => asset.type === "palette"));
+
+  useEffect(() => {
+    if (hasPaletteAsset && assetType === "palette") {
+      setAssetType("reference");
+    }
+  }, [assetType, hasPaletteAsset]);
 
   useEffect(() => {
     const containerChanged = previousContainerId.current !== (container?.id ?? null);
@@ -56,6 +66,7 @@ export function DetailPanel({
     setAssetTitle("");
     setAssetType("reference");
     setAssetNote("");
+    setAssetPalette("");
     setAssetImage(undefined);
     if (containerChanged) {
       setDetailsFeedback("");
@@ -106,19 +117,34 @@ export function DetailPanel({
     setAssetFeedback("");
 
     try {
+      if (assetType === "palette" && hasPaletteAsset) {
+        setAssetFeedback("This board already has a color palette.");
+        return;
+      }
+
       await onAddAsset({
         containerId: container.id,
         title: assetTitle.trim(),
         type: assetType,
-        note: assetType === "note" ? assetNote.trim() : undefined,
-        imageUrl: assetType === "note" ? undefined : assetImage
+        note:
+          assetType === "note"
+            ? assetNote.trim()
+            : assetType === "palette"
+              ? normalizePaletteInput(assetPalette)
+              : undefined,
+        imageUrl: assetType === "note" || assetType === "palette" ? undefined : assetImage
       });
       setAssetTitle("");
       setAssetType("reference");
       setAssetNote("");
+      setAssetPalette("");
       setAssetImage(undefined);
       setAssetFeedback(
-        assetType === "note" ? "Note added to corkboard." : "Image added to corkboard."
+        assetType === "note"
+          ? "Note added to board."
+          : assetType === "palette"
+            ? "Color palette added to board."
+            : "Image added to board."
       );
     } catch (error) {
       setAssetFeedback(error instanceof Error ? error.message : "Could not add asset.");
@@ -419,13 +445,22 @@ export function DetailPanel({
           <select
             className="select"
             value={assetType}
-            onChange={(event) => setAssetType(event.target.value as CreateAssetInput["type"])}
+            onChange={(event) => {
+              const nextType = event.target.value as CreateAssetInput["type"];
+              setAssetType(hasPaletteAsset && nextType === "palette" ? "reference" : nextType);
+            }}
           >
             <option value="reference">Reference image</option>
             <option value="sketch">Additional sketch</option>
             <option value="final">Final artwork</option>
             <option value="note">Note</option>
+            <option value="palette" disabled={hasPaletteAsset}>
+              Color palette {hasPaletteAsset ? "(already added)" : ""}
+            </option>
           </select>
+          {hasPaletteAsset ? (
+            <p className="helper tiny">This board already has a color palette.</p>
+          ) : null}
           {assetType === "note" ? (
             <textarea
               className="textarea"
@@ -434,16 +469,20 @@ export function DetailPanel({
               onChange={(event) => setAssetNote(event.target.value)}
               spellCheck={false}
             />
+          ) : assetType === "palette" ? (
+            <PaletteEditor value={assetPalette} onChange={setAssetPalette} />
           ) : (
             <label className="upload-zone form-grid">
               <span className="section-title">Upload image</span>
               <input type="file" accept="image/*" onChange={handleFileChange} />
             </label>
           )}
-          {assetFeedback ? <p className="helper asset-feedback">{assetFeedback}</p> : null}
-          <button className="button" type="submit" disabled={isAddingAsset}>
-            {isAddingAsset ? "Adding..." : "Add to corkboard"}
-          </button>
+          <div className="sticky-form-actions">
+            {assetFeedback ? <p className="helper asset-feedback">{assetFeedback}</p> : null}
+            <button className="button" type="submit" disabled={isAddingAsset}>
+              {isAddingAsset ? "Adding..." : "Add to board"}
+            </button>
+          </div>
         </form>
       ) : null}
     </section>

@@ -1,4 +1,4 @@
-export type AssetType = "reference" | "sketch" | "final" | "note";
+export type AssetType = "reference" | "sketch" | "final" | "note" | "palette";
 
 export type UserProfile = {
   id: string;

@@ -52,7 +52,7 @@ create table if not exists public.assets (
   container_id uuid not null references public.containers (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
   title text not null,
-  type text not null check (type in ('reference', 'sketch', 'final', 'note')),
+  type text not null check (type in ('reference', 'sketch', 'final', 'note', 'palette')),
   image_path text,
   note text,
   is_primary boolean not null default false,
@@ -65,6 +65,10 @@ create table if not exists public.assets (
 );
 
 alter table public.assets add column if not exists display_width integer not null default 220;
+alter table public.assets drop constraint if exists assets_type_check;
+alter table public.assets
+  add constraint assets_type_check
+  check (type in ('reference', 'sketch', 'final', 'note', 'palette'));
 
 create table if not exists public.tags (
   id uuid primary key default gen_random_uuid(),

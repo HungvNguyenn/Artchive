@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { PaletteEditor } from "@/components/palette-editor";
+import { normalizePaletteInput } from "@/lib/palette";
 import { Asset, AssetType } from "@/lib/types";
 import { readFileAsDataUrl } from "@/lib/utils";
 
@@ -36,6 +38,8 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
   if (!asset) {
     return null;
   }
+
+  const isPaletteAsset = asset.type === "palette";
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -87,8 +91,13 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
       await onSave({
         title: title.trim(),
         type,
-        note: type === "note" ? note.trim() : note.trim() || undefined,
-        imageUrl: type === "note" ? undefined : imageUrl
+        note:
+          type === "note"
+            ? note.trim()
+            : type === "palette"
+              ? normalizePaletteInput(note)
+              : note.trim() || undefined,
+        imageUrl: type === "note" || type === "palette" ? undefined : imageUrl
       });
       setFeedback("Board item updated successfully.");
       setImageUrl(undefined);
@@ -125,18 +134,27 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
         placeholder="Asset title"
         spellCheck={false}
       />
-      <select
-        className="select"
-        value={type}
-        onChange={(event) => setType(event.target.value as AssetType)}
-        disabled={asset.isPrimary}
-      >
-        <option value="reference">Reference image</option>
-        <option value="sketch">Sketch</option>
-        <option value="final">Final artwork</option>
-        <option value="note">Note</option>
-      </select>
-      {type === "note" || asset.note ? (
+      {isPaletteAsset ? (
+        <div className="input fixed-type-field" aria-label="Asset type">
+          Color palette
+        </div>
+      ) : (
+        <select
+          className="select"
+          value={type}
+          onChange={(event) => setType(event.target.value as AssetType)}
+          disabled={asset.isPrimary}
+        >
+          <option value="reference">Reference image</option>
+          <option value="sketch">Sketch</option>
+          <option value="final">Final artwork</option>
+          <option value="note">Note</option>
+          <option value="palette">Color palette</option>
+        </select>
+      )}
+      {type === "palette" ? (
+        <PaletteEditor value={note} onChange={setNote} />
+      ) : type === "note" || asset.note ? (
         <textarea
           className="textarea"
           value={note}
@@ -145,7 +163,7 @@ export function AssetEditor({ asset, onSave, onDelete }: AssetEditorProps) {
           spellCheck={false}
         />
       ) : null}
-      {type !== "note" ? (
+      {type !== "note" && type !== "palette" ? (
         <label className="upload-zone form-grid">
           <span className="section-title">Replace image</span>
           {imageUrl || asset.imageUrl ? (
